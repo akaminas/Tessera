@@ -4,7 +4,7 @@
  * Neutrals, accent and status colours follow GitHub Primer's
  * "Protanopia & Deuteranopia" (red-green colour-blind) light and dark themes:
  * success is blue, danger is orange. Primer primitives are MIT-licensed.
- * Label and board colours are Trello-style pastels. Light is the default theme.
+ * Label and board colours are soft pastels. Light is the default theme.
  *
  * Variable names keep their original roles: --v-surface (page), --v-card
  * (panels), --v-grid (hairlines), --v-rule (strong lines), --v-ink (text).
@@ -36,7 +36,7 @@
   --v-status-serious: #bc4c00;
   --v-status-critical: #953800;
 
-  /* Trello-style label pastels: background and text */
+  /* Label pastels: background and text */
   --lbl-green: #4bce97;  --lbl-green-ink: #172b4d;
   --lbl-yellow: #f5cd47; --lbl-yellow-ink: #172b4d;
   --lbl-orange: #fea362; --lbl-orange-ink: #172b4d;
@@ -57,7 +57,7 @@
   --t-selected: #ddf4ff;
   --t-link: #0969da;
 
-  /* Board: Trello-style list panels and cards */
+  /* Board: list panels and cards */
   --t-list: #f1f2f4;
   --t-tile: #ffffff;
   --t-tile-shadow: 0 1px 1px rgba(9, 30, 66, 0.25), 0 0 1px rgba(9, 30, 66, 0.31);

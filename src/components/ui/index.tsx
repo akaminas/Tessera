@@ -171,8 +171,8 @@ export function Checkbox({
 /* ---------------------------------------------------------- Labels & badges */
 
 /**
- * Label colours use Trello's pastel set. The stored names predate it, so each
- * maps to its Trello colour (teal is shown as sky, moss as green, and so on).
+ * Labels use a pastel set. The stored names predate it, so each maps to a
+ * display colour (teal is shown as sky, moss as green, and so on).
  */
 const LABEL_VAR: Record<LabelColor, string> = {
   moss: 'green',
@@ -186,7 +186,7 @@ const LABEL_VAR: Record<LabelColor, string> = {
   pink: 'pink',
   grey: 'grey',
 };
-/** Trello order and names, for colour pickers and unnamed labels. */
+/** Display order and names, for colour pickers and unnamed labels. */
 export const LABEL_COLORS: LabelColor[] = ['moss', 'ochre', 'terracotta', 'red', 'mauve', 'indigo', 'teal', 'lime', 'pink', 'grey'];
 export const LABEL_NAME: Record<LabelColor, string> = {
   moss: 'Green',

@@ -5,7 +5,7 @@ import { useProjectCtx } from './context';
 import ProjectOverview from './ProjectOverview';
 
 /**
- * Opening a project shows its board, as opening a board does in Trello.
+ * Opening a project shows its board.
  * Projects without a board (or with the board switched off) show the overview.
  */
 export default function ProjectIndex() {

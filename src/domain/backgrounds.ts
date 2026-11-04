@@ -1,5 +1,5 @@
 /**
- * Board backgrounds, in the spirit of Trello: photos (from Unsplash, under the
+ * Board backgrounds: photos (from Unsplash, under the
  * Unsplash License, self-hosted in public/backgrounds), gradients and a
  * pattern. `onImage` boards get light text on a translucent header bar.
  */

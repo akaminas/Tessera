@@ -24,7 +24,7 @@ function toggle<T>(arr: T[] | undefined, v: T): T[] {
 }
 
 /**
- * One "Filter" button, as on a Trello board. Keyword, people, labels, dates and
+ * One "Filter" button. Keyword, people, labels, dates and
  * saved filters all live in its popover; the button shows how many are active.
  */
 export function FilterBar({

@@ -80,7 +80,7 @@ export function BoardList({
       className={cn('group/list flex max-h-full w-[272px] shrink-0 flex-col rounded-[12px] bg-list shadow-[var(--t-tile-shadow)]', isDragging && 'opacity-50')}
       aria-label={`List ${list.name}`}
     >
-      {/* As on Trello, the whole header drags the list; the grip appears for keyboard users and on hover. */}
+      {/* The whole header drags the list; the grip appears for keyboard users and on hover. */}
       <header className={cn('relative flex items-center gap-1 px-2 pt-2', canEdit && 'cursor-grab active:cursor-grabbing')}
         onPointerDown={(e) => {
           // Fields, buttons and menus inside the header keep their own behaviour.

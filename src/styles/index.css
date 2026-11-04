@@ -195,7 +195,7 @@
 }
 
 /* Unlayered on purpose: these must win over Tailwind text and background utilities. */
-/* Board bar over a photo or colour: light text, quiet translucent hovers (as on Trello). */
+/* Board bar over a photo or colour: light text, quiet translucent hovers. */
 .on-image .board-bar :is(h2, button, a) {
   color: #fff;
 }

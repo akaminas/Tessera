@@ -268,7 +268,7 @@ export function useBoards(projectId: string | undefined) {
   });
 }
 
-/** Trello's six starter labels: colour only, named later if useful. */
+/** Six starter labels on every new board: colour only, named later if useful. */
 export const STARTER_LABEL_COLORS = ['moss', 'ochre', 'terracotta', 'red', 'mauve', 'indigo'] as const;
 
 export async function createBoard(

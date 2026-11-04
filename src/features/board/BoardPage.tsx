@@ -331,7 +331,7 @@ export default function BoardPage() {
 
   return (
     <div className={cn('flex h-full min-h-0 flex-col', bg.onImage && 'on-image')} style={bg.style}>
-      {/* As on Trello: on a photo or colour, the board bar is translucent with light text. */}
+      {/* On a photo or colour, the board bar is translucent with light text. */}
       <div className={cn('board-bar no-print flex flex-wrap items-center gap-2 px-3 py-2 sm:px-5', bg.onImage ? 'bg-black/25 text-white backdrop-blur-[2px]' : 'border-b border-grid')}>
         <MenuRoot>
           <MenuTrigger asChild>

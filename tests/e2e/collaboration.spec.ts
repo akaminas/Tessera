@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { createTestUser, deleteTestUser, newSession, runId, type TestUser } from './helpers';
+import { createTestUser, deleteTestUser, newSession, runId, skipTour, type TestUser } from './helpers';
 
 /**
  * Two people work on the same board: persistence, invitations, permissions,
@@ -9,15 +9,17 @@ test.describe.serial('collaboration', () => {
   let alice: TestUser;
   let bob: TestUser;
   let carol: TestUser;
+  let dana: TestUser;
   let boardUrl = '';
 
   test.beforeAll(async () => {
     alice = await createTestUser('Alice');
     bob = await createTestUser('Bob');
     carol = await createTestUser('Carol');
+    dana = await createTestUser('Dana');
   });
   test.afterAll(async () => {
-    for (const u of [alice, bob, carol]) if (u) await deleteTestUser(u.id);
+    for (const u of [alice, bob, carol, dana]) if (u) await deleteTestUser(u.id);
   });
 
   test('a new user creates a workspace, a project and tasks that persist', async ({ browser }) => {
@@ -40,6 +42,8 @@ test.describe.serial('collaboration', () => {
     await expect(todo.getByText('Alpha task')).toBeVisible();
     await expect(todo.getByText('Beta task')).toBeVisible();
 
+    // Wait until both saves have reached the server, then reload.
+    await expect(page.locator('html[data-saving]')).toHaveCount(0);
     await page.reload();
     await expect(page.getByRole('region', { name: 'List To do' }).getByText('Beta task')).toBeVisible();
     await ctx.close();
@@ -110,7 +114,7 @@ test.describe.serial('collaboration', () => {
     await a.ctx.close();
   });
 
-  test('the card back and the board filter work like Trello', async ({ browser }) => {
+  test('the card back and the board filter work', async ({ browser }) => {
     const a = await newSession(browser, alice);
     await a.page.goto(boardUrl);
     // Empty sections stay hidden until chosen from "Add to card".
@@ -137,6 +141,7 @@ test.describe.serial('collaboration', () => {
 
   test('the board works on a phone without horizontal page scrolling', async ({ browser }) => {
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+    await skipTour(ctx);
     const page = await ctx.newPage();
     await page.goto('login');
     await page.getByLabel('Email').fill(alice.email);
@@ -149,6 +154,34 @@ test.describe.serial('collaboration', () => {
     await expect(page.getByRole('complementary', { name: 'Main navigation' }).getByRole('link', { name: 'My Work' })).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBeLessThanOrEqual(1);
+    await ctx.close();
+  });
+
+  test('a newcomer is offered the welcome tour once, and can replay it from the guide', async ({ browser }) => {
+    const { ctx, page } = await newSession(browser, dana, { tour: true });
+    await page.getByLabel('Create a workspace').fill(`Dana ${runId}`);
+    await page.getByRole('button', { name: 'Create workspace' }).click();
+    await expect(page.getByRole('dialog', { name: /Welcome to Tessera/ })).toBeVisible();
+    await page.getByRole('button', { name: 'Show me around' }).click();
+    await expect(page.getByRole('dialog', { name: 'Find your way' })).toBeVisible();
+    for (let i = 0; i < 7; i++) await page.getByRole('button', { name: 'Next' }).click();
+    await expect(page.getByRole('dialog', { name: 'Settings and help' })).toBeVisible();
+    await page.getByRole('button', { name: 'Finish' }).click();
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+
+    // Remembered on the profile: a fresh browser does not offer it again.
+    const again = await newSession(browser, dana, { tour: true });
+    await expect(again.page.getByRole('button', { name: 'Account menu' })).toBeVisible();
+    await again.page.waitForTimeout(1500);
+    await expect(again.page.getByRole('dialog', { name: /Welcome to Tessera/ })).toHaveCount(0);
+
+    // Replay from the top of the guide.
+    await again.page.goto('guide');
+    await again.page.getByRole('button', { name: 'Take the tour' }).click();
+    await expect(again.page.getByRole('dialog', { name: 'Find your way' })).toBeVisible();
+    await again.page.keyboard.press('Escape');
+    await expect(again.page.getByRole('dialog')).toHaveCount(0);
+    await again.ctx.close();
     await ctx.close();
   });
 });

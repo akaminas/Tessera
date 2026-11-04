@@ -66,7 +66,7 @@ export function NewBoardDialog({
       }
     >
       <div className="flex flex-col gap-3">
-        {/* A small preview of the board, as in Trello's create dialog. */}
+        {/* A small preview of the board. */}
         <div className="mx-auto flex h-24 w-56 items-start justify-center gap-1.5 rounded-[6px] pt-3" style={boardBackground(background).style} aria-hidden>
           {[0, 1, 2].map((i) => (
             <span key={i} className="h-12 w-12 rounded-[4px] bg-white/80" style={{ height: 48 - i * 10 }} />

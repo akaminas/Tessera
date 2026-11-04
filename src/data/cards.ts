@@ -1,4 +1,5 @@
 import { sb } from '@/lib/supabase';
+import { tracked } from './pending';
 import { must } from './errors';
 import { qk, queryClient } from './queryClient';
 import { safeUpdate, tableBackend } from './safeUpdate';
@@ -52,7 +53,7 @@ function refreshProject(projectId: string) {
 
 /* ==================================================================== Cards */
 
-export async function createCard(input: {
+async function createCardImpl(input: {
   project_id: string;
   board_id: string;
   list_id: string;
@@ -104,7 +105,7 @@ export async function createCard(input: {
 }
 
 /** Conflict-safe card update with optimistic cache patch. */
-export async function updateCard(card: Card, patch: Partial<Card>): Promise<Card> {
+async function updateCardImpl(card: Card, patch: Partial<Card>): Promise<Card> {
   const rollback = patchBoardCache(card.project_id, card.board_id, (d) => ({
     ...d,
     cards: d.cards.map((c) => (c.id === card.id ? { ...c, ...patch } : c)),
@@ -123,7 +124,7 @@ export async function updateCard(card: Card, patch: Partial<Card>): Promise<Card
 }
 
 /** Move a card to `listId` at visual `index` (persisted with fractional keys). */
-export async function moveCard(card: CardWithRelations, toListId: string, index: number, siblings: CardWithRelations[]) {
+async function moveCardImpl(card: CardWithRelations, toListId: string, index: number, siblings: CardWithRelations[]) {
   const placement = placeAt(siblings, card.id, index);
   if (placement.rebalance) {
     // Rare: concurrent inserts produced equal keys. Renumber the list.
@@ -313,3 +314,9 @@ export function cardsInList(cards: CardWithRelations[], listId: string): CardWit
     .filter((c) => c.list_id === listId)
     .sort((a, b) => (a.position < b.position ? -1 : a.position > b.position ? 1 : a.id < b.id ? -1 : 1));
 }
+
+export const createCard = tracked(createCardImpl);
+
+export const updateCard = tracked(updateCardImpl);
+
+export const moveCard = tracked(moveCardImpl);

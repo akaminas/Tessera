@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router';
-import { Kbd } from '@/components/ui';
+import { Compass } from 'lucide-react';
+import { Button, Kbd } from '@/components/ui';
+import { startTour } from '@/layout/Tour';
 
 /**
  * "How to use Tessera": a step-by-step walkthrough, opened from the account
@@ -21,7 +23,7 @@ const SECTIONS: GuideSection[] = [
   {
     id: 'start',
     title: '1. Get started',
-    intro: 'A workspace holds your projects and the people you work with, much like a Trello workspace.',
+    intro: 'A workspace holds your projects and the people you work with.',
     steps: [
       <>Sign in, or create an account with your email address. You can also ask for a one-time sign-in link.</>,
       <>The first time, type a name under <B>Create a workspace</B> (for example your office or team) and press <B>Create workspace</B>.</>,
@@ -44,7 +46,7 @@ const SECTIONS: GuideSection[] = [
   {
     id: 'board',
     title: '3. Work on the board',
-    intro: 'Boards work like Trello: lists from left to right, with tasks (cards) in each list.',
+    intro: 'A board has lists from left to right, with tasks (cards) in each list.',
     steps: [
       <>Press <B>Add a task</B> at the bottom of a list, type a title and press <Kbd>Enter</Kbd>. Paste several lines to add several tasks at once.</>,
       <>Drag a task to another list or position. Drag a list by its title to reorder lists.</>,
@@ -52,12 +54,12 @@ const SECTIONS: GuideSection[] = [
       <>Use the board name at the top left (<B>▾</B>) to switch between boards or create a new one.</>,
       <>Open the board’s <B>⋯</B> menu for <B>Name, description and background</B> (photos, colours and patterns), <B>Labels</B>, <B>Custom fields</B> and archived items.</>,
     ],
-    tips: [<>Every new board starts with Trello’s six colour labels. Give them names under <B>Labels</B> so their meaning is clear to everyone, including people who cannot tell the colours apart.</>],
+    tips: [<>Every new board starts with six colour labels. Give them names under <B>Labels</B> so their meaning is clear to everyone, including people who cannot tell the colours apart.</>],
   },
   {
     id: 'card',
     title: '4. Open a task',
-    intro: 'Click a task to open it, as you would the back of a Trello card.',
+    intro: 'Click a task to open all of its details.',
     steps: [
       <>Click the title to rename it. Tick the box beside the title to mark the task done.</>,
       <>Under <B>Add to card</B>, add <B>Members</B>, <B>Labels</B>, a <B>Checklist</B>, <B>Dates</B> or an <B>Attachment</B>. More options (subtasks, priority, status, repeat, dependencies, time and estimate) are under <B>More</B>.</>,
@@ -142,7 +144,7 @@ const SECTIONS: GuideSection[] = [
   {
     id: 'automate',
     title: '11. Automate routine work',
-    intro: 'Automations run on the server, like Trello’s Butler, even when nobody is signed in.',
+    intro: 'Automations run on the server, even when nobody is signed in.',
     steps: [
       <>Turn on the <B>Automations</B> module, then open its tab.</>,
       <>Start from one of the ready-made examples, or build your own rule: something that happens (the trigger), optional conditions, and what Tessera should do.</>,
@@ -209,8 +211,15 @@ export default function GuidePage() {
       <article className="min-w-0 flex-1">
         <header className="mb-8">
           <h1 className="text-3xl">How to use Tessera</h1>
+          <div className="mt-4 flex flex-wrap items-center gap-3 rounded-[8px] bg-accent-soft px-4 py-3">
+            <Compass className="size-5 shrink-0 text-teal-deep" aria-hidden />
+            <p className="min-w-0 flex-1 text-sm">New here? A one-minute tour points out the main parts of the screen.</p>
+            <Button size="sm" variant="primary" onClick={() => startTour()}>
+              Take the tour
+            </Button>
+          </div>
           <p className="mt-2 max-w-2xl text-secondary">
-            If you have used Trello, you already know most of Tessera: boards, lists and cards work the same way. This guide walks through each part step by step, from your
+            Boards, lists and cards are at the heart of Tessera. This guide walks through each part step by step, from your
             first workspace to automations.
           </p>
         </header>

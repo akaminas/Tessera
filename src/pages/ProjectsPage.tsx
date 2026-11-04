@@ -65,7 +65,7 @@ export default function ProjectsPage() {
           Start from a template, or a blank project with a single board.
         </EmptyState>
       )}
-      {/* Trello-style tiles: each project shows its first board's background. */}
+      {/* Tiles: each project shows its first board's background. */}
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {list.map((p) => {
           const bg = boardBackground(backgrounds.data?.get(p.id) ?? 'grad-ocean');

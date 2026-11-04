@@ -26,8 +26,8 @@ export function useWorkspaceTemplates(workspaceId: string | undefined) {
 
 /** Apply a blueprint to a (new) project, atomically on the server. */
 /**
- * Every board starts like a fresh Trello board: the template's own labels plus
- * Trello's six colour-only starter labels for any colour the template leaves unused.
+ * Every board starts with the template's own labels plus the six colour-only
+ * starter labels for any colour the template leaves unused.
  */
 export function withStarterLabels(blueprint: Blueprint): Blueprint {
   const labels = blueprint.labels ?? [];

@@ -1,4 +1,4 @@
-import { expect, type Browser, type Page } from '@playwright/test';
+import { expect, type Browser, type BrowserContext, type Page } from '@playwright/test';
 
 const SUPABASE_URL = process.env.E2E_SUPABASE_URL ?? process.env.VITE_SUPABASE_URL ?? '';
 const SERVICE_KEY = process.env.E2E_SERVICE_ROLE_KEY ?? '';
@@ -47,8 +47,14 @@ export async function signIn(page: Page, user: { email: string; password: string
   await expect(page.getByRole('button', { name: 'Account menu' }).or(page.getByText('Create a workspace'))).toBeVisible();
 }
 
-export async function newSession(browser: Browser, user: { email: string; password: string }) {
+/** Mark the welcome tour as seen, so it does not cover the page in tests about other things. */
+export async function skipTour(ctx: BrowserContext) {
+  await ctx.addInitScript(() => localStorage.setItem('tessera.tour', 'done'));
+}
+
+export async function newSession(browser: Browser, user: { email: string; password: string }, opts: { tour?: boolean } = {}) {
   const ctx = await browser.newContext();
+  if (!opts.tour) await skipTour(ctx);
   const page = await ctx.newPage();
   await signIn(page, user);
   return { ctx, page };

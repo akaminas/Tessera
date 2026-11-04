@@ -190,7 +190,7 @@ export function CardDialog({ cardId, ctx, onClose }: { cardId: string; ctx: Proj
               <div className="scroll-thin min-h-0 flex-1 overflow-y-auto">
                 <div className={cn('grid gap-6 px-4 py-4 sm:px-5', !wide && 'md:grid-cols-[1fr_240px]')}>
                   <div className="flex min-w-0 flex-col gap-6">
-                    {/* Trello's summary row: only what this task actually has. */}
+                    {/* Summary row: only what this task actually has. */}
                     <div className="flex flex-wrap gap-x-6 gap-y-3 empty:hidden">
                       {(assigned.size > 0 || shown.has('members')) && (
                         <Prop label="Members">
@@ -472,7 +472,7 @@ function SideGroup({ title, children }: { title: string; children: React.ReactNo
   );
 }
 
-/** A full-width, quiet button in the card sidebar, as on the back of a Trello card. */
+/** A full-width, quiet button in the card sidebar. */
 const SideButton = forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement> & { icon: React.ReactNode }>(function SideButton(
   { icon, children, className, ...rest },
   ref,

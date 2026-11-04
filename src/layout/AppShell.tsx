@@ -38,6 +38,7 @@ import { QuickAddDialog } from './QuickAdd';
 import { Onboarding } from './Onboarding';
 import { useToast } from '@/components/ui/Toast';
 import { FocusProvider, useFocusMode } from './focus';
+import { Tour } from './Tour';
 
 const NAV = [
   { to: '/', label: 'Home', icon: Home, end: true, keys: 'g h' },
@@ -149,6 +150,7 @@ function ShellInner({ children }: { children: ReactNode }) {
         </main>
       </div>
       <QuickAddDialog open={quickAdd} onOpenChange={setQuickAdd} />
+      <Tour />
     </div>
   );
 }
@@ -203,6 +205,7 @@ function TopBar({
       </Link>
       <form
         role="search"
+        data-tour="search"
         className="relative max-w-md flex-1"
         onSubmit={(e) => {
           e.preventDefault();
@@ -234,13 +237,14 @@ function TopBar({
           </Button>
         )}
         <SyncIndicator state={sync} />
-        <Button size="sm" variant="primary" icon={<Plus className="size-4" />} onClick={onQuickAdd} title="Quick add (q)">
+        <Button size="sm" variant="primary" icon={<Plus className="size-4" />} onClick={onQuickAdd} title="Quick add (q)" data-tour="add-task">
           <span className="hidden sm:inline">Add task</span>
         </Button>
         <Link
           to="/inbox"
           className="relative inline-flex size-8 items-center justify-center rounded-[4px] text-secondary hover:bg-hover"
           aria-label={unread ? `Inbox, ${unread} unread` : 'Inbox'}
+          data-tour="inbox"
         >
           <Bell className="size-4" />
           {unread > 0 && (
@@ -251,7 +255,7 @@ function TopBar({
         </Link>
         <MenuRoot>
           <MenuTrigger asChild>
-            <button className="flex items-center gap-1 rounded-[4px] p-1 hover:bg-hover" aria-label="Account menu">
+            <button className="flex items-center gap-1 rounded-[4px] p-1 hover:bg-hover" aria-label="Account menu" data-tour="account">
               <Avatar name={profileName} color={profileColor} size={26} />
               <ChevronDown className="hidden size-3.5 text-muted sm:block" />
             </button>
@@ -314,7 +318,7 @@ function Sidebar() {
     <nav className="flex flex-col gap-4 p-3 text-sm">
       <MenuRoot>
         <MenuTrigger asChild>
-          <button className="flex w-full items-center gap-2 rounded-[4px] border border-grid px-2 py-1.5 text-left hover:bg-hover">
+          <button data-tour="workspace" className="flex w-full items-center gap-2 rounded-[4px] border border-grid px-2 py-1.5 text-left hover:bg-hover">
             <span className="min-w-0 flex-1">
               <span className="block text-[11px] text-secondary">Workspace</span>
               <span className="block truncate font-bold">{current?.name}</span>
@@ -336,7 +340,7 @@ function Sidebar() {
         </MenuContent>
       </MenuRoot>
 
-      <ul className="flex flex-col gap-0.5">
+      <ul className="flex flex-col gap-0.5" data-tour="nav">
         {NAV.filter((n) => n.to !== "/settings").map((n) => (
           <li key={n.to}>
             <NavLink
@@ -387,7 +391,7 @@ function Sidebar() {
         </div>
       )}
 
-      <div>
+      <div data-tour="projects">
         <div className="mb-1 flex items-center justify-between px-2">
           <h2 className="font-sans text-xs font-bold text-secondary">Projects</h2>
           <Link to="/projects?new=1" className="text-muted hover:text-ink" aria-label="New project">

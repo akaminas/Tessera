@@ -29,6 +29,8 @@ export interface UserPreferences {
   quietHours?: { from: string; to: string } | null;
   homeLayout?: { collapsed?: string[] };
   shortcuts?: boolean;
+  /** Welcome tour: offered once, then remembered. */
+  tour?: 'done' | 'skipped';
   hoursPerPersonMonth?: number;
 }
 

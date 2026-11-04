@@ -65,7 +65,7 @@ export default function ProjectLayout() {
   const cardId = params.get('card');
 
   const tabs: { to: string; label: string; module?: ProjectModule; end?: boolean }[] = [
-    // Views of the same tasks first (as Trello's view switcher), then the project's own pages.
+    // Views of the same tasks first, then the project's own pages.
     ...(firstBoard ? [{ to: `board/${firstBoard.id}`, label: 'Board', module: 'board' as const }] : []),
     { to: 'table', label: 'Table', module: 'table' },
     { to: 'timeline', label: 'Timeline', module: 'timeline' },

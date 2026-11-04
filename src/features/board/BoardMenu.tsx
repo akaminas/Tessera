@@ -173,7 +173,7 @@ function EditBoard({ board, onClose }: { board: Board; onClose: () => void }) {
   );
 }
 
-/** Trello-style background grid: photos first, then gradients and patterns. */
+/** Background grid: photos first, then gradients and patterns. */
 export function BackgroundPicker({ value, onChange }: { value: string; onChange: (id: string) => void }) {
   const current = boardBackground(value).id;
   const groups: { title: string; items: typeof BOARD_BACKGROUNDS }[] = [
@@ -247,7 +247,7 @@ function LabelsManager({ board, labels, onClose }: { board: Board; labels: Label
           Add
         </Button>
       </form>
-      <p className="mt-3 text-xs text-secondary">A label can have just a colour, as on Trello. Naming it helps people who cannot tell the colours apart.</p>
+      <p className="mt-3 text-xs text-secondary">A label can be just a colour. Naming it helps people who cannot tell the colours apart.</p>
     </Dialog>
   );
 }
