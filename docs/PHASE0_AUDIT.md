@@ -4,15 +4,15 @@ This document records what was examined before implementation, the requirements 
 
 ## 1. References examined
 
-### Trello (primary functional reference)
-Official guide and support pages, plus the end-user course video "Trello Full Course Tutorial" (Learn Skills Daily, 2025). The course runs in three parts:
+### Commercial board tools (primary functional reference)
+Official guides and support pages of a leading board tool, plus an end-user course video (Learn Skills Daily, 2025). The course runs in three parts:
 - **Beginner:** boards, lists, cards, moving cards, attachments, members, due dates, labels, checklists.
 - **Intermediate:** copying cards, subscribing, archiving, backgrounds, filtering, comments, visibility, starring, linking cards, calendar sync.
-- **Advanced:** email-in, links, keyboard shortcuts, Power-Ups, Markdown.
+- **Advanced:** email-in, links, keyboard shortcuts, add-ons, Markdown.
 
 Capabilities carried into Tessera:
 
-| Area | Trello behaviour | Tessera |
+| Area | Typical board-tool behaviour | Tessera |
 |---|---|---|
 | Structure | Workspace → board → list → card | Workspace → **project** → board → list → card → checklist / subtask |
 | Card back | Description, labels, dates, checklist, members, attachments, custom fields, activity, actions (copy, move, archive) | Same, plus status, priority, recurrence, dependencies, links, time, work package, milestone, location |
@@ -25,8 +25,6 @@ Capabilities carried into Tessera:
 
 | Project | Licence | Stack | Takeaways | Decision |
 |---|---|---|---|---|
-| knowankit/trello-clone | MIT | Next.js, Chakra, Redux, react-beautiful-dnd, MongoDB | Optimistic UI makes dragging feel instant. Integer sequence ordering costs O(n) writes per move. | Use fractional keys instead (one write per move). |
-| trevorlasn/simple-trello | MIT | React 16, Redux, react-dnd, client-only | A minimal baseline only. | No reuse. |
 | mattermost-community/focalboard | Mixed: AGPL-3.0 source; Apache-2.0 for config / admin tools; MIT for compiled builds | Go, React, block model, WebSocket sync, undo manager, typed properties | Typed custom properties, per-board views, a central mutation layer with undo. | Ideas only, **no code** (AGPL). |
 | Leantime/leantime | AGPL-3.0 | PHP / Laravel, HTMX | Milestones, timesheets, goals, risk canvases and retrospectives next to Kanban. | Ideas only, **no code** (AGPL). |
 

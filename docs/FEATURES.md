@@ -11,7 +11,7 @@
 - **Browser flows:** covered by `tests/e2e`, which needs a live Supabase backend (see [DEPLOYMENT.md](DEPLOYMENT.md)).
 - **Live backend (4 November 2026):** all 7 migrations were applied to the hosted Supabase project. All 56 tables have RLS. pg_cron runs the scheduler every minute without errors; pg_net is installed; Realtime publishes the change feed and notifications; the attachments bucket is private. The 6 end-to-end tests pass in Chromium against it, covering sign-in, workspace and project creation, invitations, two people editing live, @mentions with notifications, outsider isolation, the card back and board filter, deep links, dark theme and the phone layout. The calendar subscription feed (Edge Function `ical`) was checked against it as well. Test accounts are deleted afterwards through the Auth admin API.
 
-## Core structure and Trello functionality
+## Core structure and board functionality
 
 | Feature | Status | Notes |
 |---|---|---|
@@ -23,7 +23,7 @@
 | Sharing, invitations, visibility | Complete | Invitation links tied to an email; workspace or private projects; guests. |
 | Board favourites, bookmarks | Complete | Bookmarks for boards, projects, cards and URLs in the sidebar. |
 | Board filtering, saved filters / views | Complete | Shared filter engine across views; saved views can be shared with the project. |
-| Backgrounds and appearance | Complete | Eight Unsplash photos, Trello-style gradients and patterns; boards start on a photo. Light (default) and dark themes on GitHub's colour-blind palette; density; motion. |
+| Backgrounds and appearance | Complete | Eight Unsplash photos, gradients and patterns; boards start on a photo. Light (default) and dark themes on GitHub's colour-blind palette; density; motion. |
 | In-app guide | Complete | "How to use Tessera" in the account menu: 14 step-by-step sections and a shortcut table. |
 | Workspace-wide full-text search | Complete | Tasks, descriptions, projects, boards, comments; RLS-limited. |
 | Activity history: board, project, workspace, card | Complete | Trigger-written audit trail. |

@@ -1,8 +1,8 @@
 -- =============================================================================
--- Tessera: Trello-style boards
---   * Labels gain Trello's red, pink and lime alongside the existing colours
---     (shown as Trello's green, yellow, orange, purple, blue, sky and grey).
---   * New boards start on a photo background, as Trello boards do.
+-- Tessera: photo boards and pastel labels
+--   * Labels gain red, pink and lime alongside the existing colours
+--     (shown as green, yellow, orange, purple, blue, sky and grey).
+--   * New boards start on a photo background.
 -- =============================================================================
 
 alter table public.labels drop constraint if exists labels_color_check;

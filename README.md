@@ -2,10 +2,10 @@
 
 **Collaborative project management for individuals, teams and multi-partner institutional projects.**
 
-Tessera combines a Trello-style board for everyday work with the planning, reporting and financial controls of funded, multi-partner projects. A simple project is just a board. As a project grows, you switch on work packages, milestones and deliverables, budgets, KPIs, risks, meetings and automations. Everything lives in one connected database, so a change in one view appears in every other view.
+Tessera combines a simple board for everyday work with the planning, reporting and financial controls of funded, multi-partner projects. A simple project is just a board. As a project grows, you switch on work packages, milestones and deliverables, budgets, KPIs, risks, meetings and automations. Everything lives in one connected database, so a change in one view appears in every other view.
 
 - **Live app:** <https://akaminas.github.io/Tessera/>
-- **Look:** Trello-style boards with photo and gradient backgrounds, Trello pastel labels, the Inter typeface, and GitHub's red-green colour-blind palette in both light (default) and dark themes
+- **Look:** boards with photo and gradient backgrounds, pastel labels, the Inter typeface, and GitHub's red-green colour-blind palette in both light (default) and dark themes
 
 ## What it does
 

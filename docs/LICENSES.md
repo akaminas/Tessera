@@ -4,18 +4,15 @@ Tessera's own code is released under the MIT licence (see `LICENSE`). **No sourc
 
 | Reference | Licence | Use in Tessera |
 |---|---|---|
-| knowankit/trello-clone | MIT | Ideas only (optimistic drag and drop). |
-| trevorlasn/simple-trello | MIT | Ideas only (minimal board UX baseline). |
 | mattermost-community/focalboard | AGPL-3.0 source; Apache-2.0 for config and admin tools; MIT for compiled builds | Ideas only (typed properties, per-board views, undo). **No code**, because AGPL is incompatible with distributing Tessera under MIT. |
 | Leantime/leantime | AGPL-3.0 | Ideas only (milestones, timesheets, goals and risks alongside Kanban). **No code**, for the same reason. |
-| Trello (Atlassian) | Proprietary | Functional reference. No assets, names, artwork or text reused. |
 
 ## Design assets
 
 | Asset | Licence | Notes |
 |---|---|---|
 | Colour values (`src/styles/theme.css`) | GitHub Primer primitives, MIT | Neutral, accent and status values follow Primer's light and dark "Protanopia & Deuteranopia" themes. No Primer code is bundled. |
-| Label and board pastels | Colour values only | Chosen to match the look of Trello's label palette. Colours are not copyrightable, and no Atlassian assets, icons or text are used. |
+| Label and board pastels | Colour values only | Soft pastel values chosen for labels and board colours. Colours are not copyrightable, and no third-party assets, icons or text are used. |
 | Inter (`@fontsource-variable/inter`) | SIL Open Font License 1.1 | Self-hosted, unmodified. |
 | Board photos (`public/backgrounds/*.webp`) | [Unsplash License](https://unsplash.com/license) | Eight photos downloaded from Unsplash, resized to 1920×1080 and 320×180 WebP and self-hosted, so no third-party request is made. The licence allows free use without attribution; the picker credits Unsplash. Source photo IDs: 1501785888041-af3ef285b470, 1506905925346-21bda4d32df4, 1464822759023-fed622ff2c3b, 1507525428034-b723cf961d3e, 1441974231531-c6227db76b6e, 1418065460487-3e41a6c84dc5, 1519681393784-d120267933ba, 1500530855697-b586d89ba3ee. |
 | Map tiles | © OpenStreetMap contributors (ODbL) | Loaded at runtime with on-map attribution, per the OSM tile usage policy. |
