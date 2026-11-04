@@ -17,7 +17,8 @@ export interface ListActions {
   archiveCards(list: List): void;
   sort(list: List, by: 'due' | 'priority' | 'title' | 'created'): void;
   moveToBoard(list: List, boardId: string): void;
-  addCards(list: List, titles: string[], atTop?: boolean): Promise<void>;
+  /** Resolves with the titles that could not be saved (empty on success). */
+  addCards(list: List, titles: string[], atTop?: boolean): Promise<string[]>;
   renameCard(card: CardWithRelations, title: string): void;
 }
 
@@ -269,7 +270,7 @@ function MoveListForm({ boards, onMove }: { boards: Board[]; onMove: (id: string
 }
 
 /** Task composer. Pasting several lines offers to create one task per line. */
-function Composer({ onSubmit, onClose }: { onSubmit: (titles: string[]) => Promise<void>; onClose: () => void }) {
+function Composer({ onSubmit, onClose }: { onSubmit: (titles: string[]) => Promise<string[]>; onClose: () => void }) {
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const ref = useRef<HTMLTextAreaElement>(null);
@@ -278,12 +279,17 @@ function Composer({ onSubmit, onClose }: { onSubmit: (titles: string[]) => Promi
     .map((l) => l.replace(/^[-*•]\s+/, '').trim())
     .filter(Boolean);
   const submit = async (multi: boolean) => {
-    if (!lines.length) return;
+    if (!lines.length || busy) return;
+    const previous = text;
+    // Clear at once so a second Enter cannot create duplicates; restore on failure.
+    setText('');
     setBusy(true);
     try {
-      await onSubmit(multi ? lines : [lines.join(' ')]);
-      setText('');
+      const unsaved = await onSubmit(multi ? lines : [lines.join(' ')]);
+      if (unsaved.length) setText((t) => t || unsaved.join('\n'));
       ref.current?.focus();
+    } catch {
+      setText((t) => t || previous);
     } finally {
       setBusy(false);
     }

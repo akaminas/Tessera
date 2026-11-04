@@ -251,12 +251,15 @@ export default function BoardPage() {
     addCards: async (l, titles) => {
       const inList = allCards.filter((c) => c.list_id === l.id);
       const keys = keysAfter(inList, titles.length);
+      let i = 0;
       try {
-        for (let i = 0; i < titles.length; i++) {
+        for (; i < titles.length; i++) {
           await createCard({ project_id: project.id, board_id: l.board_id, list_id: l.id, title: titles[i].slice(0, 500), position: keys[i] });
         }
+        return [];
       } catch (err) {
         toast.error(err);
+        return titles.slice(i); // the titles that were not saved
       }
     },
     renameCard: (c, title) => updateCard(c, { title }).catch(toast.error),

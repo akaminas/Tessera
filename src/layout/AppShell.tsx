@@ -99,7 +99,11 @@ function ShellInner({ children }: { children: ReactNode }) {
   );
 
   if (loading) return <PageLoading />;
-  if (workspaces.length === 0 || !current) return <Onboarding />;
+  if (workspaces.length === 0 || !current) {
+    // An invitation link must open its own page, even before the person has a workspace.
+    if (location.pathname.includes('/invite/')) return <>{children}</>;
+    return <Onboarding />;
+  }
 
   return (
     <div className="flex h-dvh min-h-0 flex-col">

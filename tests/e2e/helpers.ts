@@ -32,10 +32,11 @@ export async function createTestUser(name: string): Promise<TestUser> {
 }
 
 export async function deleteTestUser(id: string) {
-  await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${id}`, {
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${id}`, {
     method: 'DELETE',
     headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` },
   });
+  if (!res.ok) throw new Error(`Could not delete test user: ${res.status} ${await res.text()}`);
 }
 
 export async function signIn(page: Page, user: { email: string; password: string }) {

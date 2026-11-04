@@ -57,6 +57,7 @@ test.describe.serial('collaboration', () => {
     const b = await newSession(browser, bob);
     await b.page.goto(inviteLink);
     await b.page.getByRole('button', { name: 'Accept invitation' }).click();
+    await expect(b.page.getByRole('button', { name: 'Account menu' })).toBeVisible();
     await b.page.goto(boardUrl);
     await expect(b.page.getByText('Alpha task')).toBeVisible();
 
@@ -88,6 +89,7 @@ test.describe.serial('collaboration', () => {
     const c = await newSession(browser, carol);
     await c.page.getByLabel('Create a workspace').fill(`Carol ${runId}`);
     await c.page.getByRole('button', { name: 'Create workspace' }).click();
+    await expect(c.page.getByRole('button', { name: 'Account menu' })).toBeVisible();
     await c.page.goto(boardUrl);
     await expect(c.page.getByText(/not found|no longer have access/i).first()).toBeVisible();
     await expect(c.page.getByText('Alpha task')).toHaveCount(0);
@@ -119,7 +121,7 @@ test.describe.serial('collaboration', () => {
     await page.goto(boardUrl);
     await expect(page.getByText('Alpha task')).toBeVisible();
     await page.getByRole('button', { name: 'Toggle navigation' }).click();
-    await expect(page.getByRole('navigation', { name: 'Main navigation' }).getByText('My Work')).toBeVisible();
+    await expect(page.getByRole('complementary', { name: 'Main navigation' }).getByRole('link', { name: 'My Work' })).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBeLessThanOrEqual(1);
     await ctx.close();

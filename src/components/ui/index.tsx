@@ -10,6 +10,7 @@ import {
 } from 'react';
 import { AlertTriangle, CheckCircle2, ChevronDown, ChevronRight, CircleDot, Loader2, OctagonAlert, Circle } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { humanError } from '@/data/errors';
 import type { CardStatus, Family, LabelColor, Priority } from '@/data/types';
 
 /* ------------------------------------------------------------------ Buttons */
@@ -319,7 +320,7 @@ export function PageLoading() {
 }
 
 export function ErrorNote({ error, retry }: { error: unknown; retry?: () => void }) {
-  const msg = error instanceof Error ? error.message : String((error as { message?: string })?.message ?? error);
+  const msg = humanError(error);
   return (
     <div role="alert" className="flex items-start gap-2 rounded-[4px] border border-rule bg-card p-3 text-sm">
       <AlertTriangle className="mt-0.5 size-4 shrink-0 text-serious" aria-hidden />
