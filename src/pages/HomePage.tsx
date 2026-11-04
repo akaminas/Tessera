@@ -27,9 +27,14 @@ export default function HomePage() {
   const [capture, setCapture] = useState('');
 
   const groups = useMemo(() => groupWork(work.data ?? []), [work.data]);
-  const overdue = groups.find((g) => g.bucket === 'overdue')?.items ?? [];
-  const today = groups.find((g) => g.bucket === 'today')?.items ?? [];
-  const week = groups.find((g) => g.bucket === 'week')?.items ?? [];
+  const { overdue, today, week } = useMemo(
+    () => ({
+      overdue: groups.find((g) => g.bucket === 'overdue')?.items ?? [],
+      today: groups.find((g) => g.bucket === 'today')?.items ?? [],
+      week: groups.find((g) => g.bucket === 'week')?.items ?? [],
+    }),
+    [groups],
+  );
   const inboxCount = inbox.data ? (inboxBoard.data?.cards ?? []).filter((c) => c.list_id === inbox.data!.list_id && c.status !== 'done').length : 0;
   const priorities = useMemo(
     () => [...today, ...week, ...overdue].filter((w) => w.priority === 'urgent' || w.priority === 'high').slice(0, 5),

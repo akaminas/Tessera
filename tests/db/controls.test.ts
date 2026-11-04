@@ -283,3 +283,16 @@ describe('KPIs', () => {
     expect(s.measurements).toBe(2);
   });
 });
+
+describe('deletion', () => {
+  it('deletes a project with partners and budget, then the whole workspace', async () => {
+    const before = await admin(`select count(*)::int n from budget_lines where project_id = $1`, [project]);
+    expect(before[0].n).toBeGreaterThan(0);
+    await as(manager.id, (q) => q(`delete from projects where id = $1`, [project]));
+    const after = await admin(`select (select count(*) from budget_lines where project_id = $1)::int lines, (select count(*) from project_partners where project_id = $1)::int partners`, [project]);
+    expect(after[0]).toEqual({ lines: 0, partners: 0 });
+    await as(manager.id, (q) => q(`delete from workspaces where id = $1`, [ws]));
+    const left = await admin(`select (select count(*) from organizations where workspace_id = $1)::int orgs, (select count(*) from projects where workspace_id = $1)::int projects`, [ws]);
+    expect(left[0]).toEqual({ orgs: 0, projects: 0 });
+  });
+});

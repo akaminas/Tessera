@@ -44,6 +44,7 @@ import { useToast } from '@/components/ui/Toast';
 import { cn } from '@/lib/cn';
 import { keyAfterLast, keysAfter, sortByPosition } from '@/domain/ordering';
 import type { ProjectCtx } from '@/features/project/context';
+import { GitHubLinkStatus } from '@/features/automation/GitHubLinkStatus';
 
 function SectionTitle({ icon, children, actions }: { icon: React.ReactNode; children: React.ReactNode; actions?: React.ReactNode }) {
   return (
@@ -169,7 +170,10 @@ function ItemRow({
             onKeyDown={(e) => {
               e.stopPropagation();
               if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
-              if (e.key === 'Escape') (setTitle(item.title), setEditing(false));
+              if (e.key === 'Escape') {
+                setTitle(item.title);
+                setEditing(false);
+              }
             }}
             className="h-7 flex-1 rounded-[3px] border border-teal bg-surface px-1 text-sm focus:outline-none"
             aria-label="Item title"
@@ -311,7 +315,10 @@ function AddItems({
             e.preventDefault();
             submit();
           }
-          if (e.key === 'Escape') (setOpen(false), onClose?.());
+          if (e.key === 'Escape') {
+            setOpen(false);
+            onClose?.();
+          }
         }}
         className="w-full resize-none rounded-[4px] border border-teal bg-surface p-1.5 text-sm focus:outline-none"
       />
@@ -513,6 +520,7 @@ export function AttachmentsSection({ card, canEdit }: { card: Card; canEdit: boo
               <span className="text-xs text-secondary">
                 {a.kind === 'link' ? linkKind(a.url!) ?? 'Link' : a.size_bytes != null ? formatBytes(a.size_bytes) : ''}
               </span>
+              {a.kind === 'link' && <GitHubLinkStatus url={a.url!} />}
               {canEdit && (
                 <IconButton label={`Remove ${a.name}`} onClick={() => removeAttachment(a).catch(toast.error)}>
                   <Trash2 className="size-3.5" />

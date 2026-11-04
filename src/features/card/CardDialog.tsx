@@ -45,6 +45,7 @@ import { describeRecurrence } from '@/domain/recurrence';
 import { appUrl } from '@/lib/env';
 import { ChecklistsSection, SubtasksSection, AttachmentsSection, FieldsSection, RelationsSection, TimeSection } from './CardSections';
 import { CommentsAndActivity } from './CardComments';
+import { CardButtons } from '@/features/automation/CardButtons';
 
 export function CardDialog({ cardId, ctx, onClose }: { cardId: string; ctx: ProjectCtx; onClose: () => void }) {
   const { project, canEdit, people } = ctx;
@@ -361,6 +362,7 @@ export function CardDialog({ cardId, ctx, onClose }: { cardId: string; ctx: Proj
                         <span>{card.responsible_text}</span>
                       </Prop>
                     )}
+                    {ctx.has('automations') && <CardButtons projectId={card.project_id} boardId={card.board_id} cardId={card.id} canEdit={canEdit} />}
                     <div className="flex flex-col gap-1.5 border-t border-grid pt-3">
                       {canEdit && (
                         <Button

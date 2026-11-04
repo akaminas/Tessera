@@ -43,6 +43,7 @@ import { FilterBar } from '@/features/views/FilterBar';
 import { BoardList, type ListActions } from './BoardList';
 import { CardTileOverlay } from './CardTile';
 import { BoardMenu } from './BoardMenu';
+import { BoardButtons } from '@/features/automation/BoardButtons';
 import { BulkBar } from './BulkBar';
 import { NewBoardDialog } from './NewBoardDialog';
 import { usePersistentState } from '@/lib/usePersistentState';
@@ -392,6 +393,7 @@ export default function BoardPage() {
               Select
             </Button>
           )}
+          {ctx.has('automations') && <BoardButtons projectId={project.id} boardId={board.id} canEdit={canEdit} />}
           <BoardMenu board={board} labels={data.data?.labels ?? []} lists={lists} />
         </div>
       </div>

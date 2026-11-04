@@ -2,7 +2,7 @@
   "name": "tessera",
   "private": true,
   "version": "0.1.0",
-  "description": "Tessera — collaborative project management for individuals, teams and multi-partner institutional projects.",
+  "description": "Tessera \u2014 collaborative project management for individuals, teams and multi-partner institutional projects.",
   "license": "MIT",
   "type": "module",
   "engines": {
@@ -18,7 +18,7 @@
     "test:db": "vitest run --project db",
     "test:all": "vitest run",
     "test:e2e": "playwright test",
-    "db:push": "node scripts/supabase-push.mjs"
+    "db:push": "node scripts/setup-supabase.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

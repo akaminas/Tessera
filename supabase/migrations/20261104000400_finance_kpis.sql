@@ -49,9 +49,9 @@ select public.apply_project_rls('partner_finance', true);
 create table public.budget_lines (
   id uuid primary key default gen_random_uuid(),
   project_id uuid not null references public.projects (id) on delete cascade,
-  partner_id uuid references public.project_partners (id) on delete restrict,
+  partner_id uuid references public.project_partners (id),
   work_package_id uuid references public.work_packages (id) on delete set null,
-  category_id uuid not null references public.cost_categories (id) on delete restrict,
+  category_id uuid not null references public.cost_categories (id),
   financial_year int check (financial_year is null or financial_year between 1990 and 2200),
   reporting_period_id uuid references public.reporting_periods (id) on delete set null,
   description text not null default '',
@@ -75,9 +75,9 @@ select public.apply_project_rls('budget_lines', true);
 create table public.expenditures (
   id uuid primary key default gen_random_uuid(),
   project_id uuid not null references public.projects (id) on delete cascade,
-  partner_id uuid references public.project_partners (id) on delete restrict,
+  partner_id uuid references public.project_partners (id),
   work_package_id uuid references public.work_packages (id) on delete set null,
-  category_id uuid not null references public.cost_categories (id) on delete restrict,
+  category_id uuid not null references public.cost_categories (id),
   budget_line_id uuid references public.budget_lines (id) on delete set null,
   reporting_period_id uuid references public.reporting_periods (id) on delete set null,
   spent_on date not null,

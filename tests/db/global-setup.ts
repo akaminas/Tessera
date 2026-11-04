@@ -69,7 +69,7 @@ export default async function setup(project: TestProject) {
       try {
         await client.query(readFileSync(join(dir, file), 'utf8'));
       } catch (err) {
-        throw new Error(`Migration ${file} failed: ${(err as Error).message}`);
+        throw new Error(`Migration ${file} failed: ${(err as Error).message}`, { cause: err });
       }
     }
   } catch (err) {

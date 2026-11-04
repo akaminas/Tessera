@@ -47,7 +47,7 @@ end $$;
 create table public.project_partners (
   id uuid primary key default gen_random_uuid(),
   project_id uuid not null references public.projects (id) on delete cascade,
-  organization_id uuid not null references public.organizations (id) on delete restrict,
+  organization_id uuid not null references public.organizations (id),
   role text not null default 'partner' check (role in ('coordinator','partner','associated','subcontractor','third_party')),
   short_name text not null default '',
   contact_user_id uuid references auth.users (id) on delete set null,

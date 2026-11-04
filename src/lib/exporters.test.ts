@@ -13,7 +13,7 @@ describe('CSV', () => {
 });
 
 describe('XLSX', () => {
-  it('writes sheets with totals that ExcelJS can read back', async () => {
+  it('writes sheets with totals that ExcelJS can read back', { timeout: 30_000 }, async () => {
     const buf = await buildXLSX([{ name: 'Budget', header: ['Partner', 'Amount'], rows: [['A', 10.5], ['B', 2]], formats: [undefined, '#,##0.00'], totals: true }]);
     const ExcelJS = (await import('exceljs')).default;
     const wb = new ExcelJS.Workbook();

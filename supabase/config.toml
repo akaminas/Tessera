@@ -1,0 +1,21 @@
+# Supabase CLI configuration for Tessera.
+project_id = "tessera"
+
+[api]
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 5000
+
+[auth]
+site_url = "https://akaminas.github.io/Tessera/"
+additional_redirect_urls = ["https://akaminas.github.io/Tessera/auth/callback", "https://akaminas.github.io/Tessera/auth/reset", "http://localhost:5173/Tessera/auth/callback", "http://localhost:5173/Tessera/auth/reset"]
+enable_signup = true
+
+[auth.email]
+enable_confirmations = true
+
+[functions.ical]
+verify_jwt = false
+
+[functions.email-digest]
+verify_jwt = false

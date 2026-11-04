@@ -22,10 +22,32 @@ function patchBoardCache(projectId: string, boardId: string, fn: (d: BoardData) 
   };
 }
 
+let kickTimer: ReturnType<typeof setTimeout> | null = null;
+/**
+ * Ask the server to process queued automation events now, so rules react
+ * within a second of a change (the per-minute scheduler is the safety net).
+ * The automations themselves always run server-side.
+ */
+export function kickAutomations() {
+  if (kickTimer) clearTimeout(kickTimer);
+  kickTimer = setTimeout(() => {
+    kickTimer = null;
+    sb()
+      .rpc('kick_automations')
+      .then(({ data }) => {
+        if (typeof data === 'number' && data > 0) {
+          queryClient.invalidateQueries({ queryKey: ['p'] });
+          queryClient.invalidateQueries({ queryKey: ['me'] });
+        }
+      });
+  }, 400);
+}
+
 function refreshProject(projectId: string) {
   queryClient.invalidateQueries({ queryKey: qk.project(projectId) });
   queryClient.invalidateQueries({ queryKey: ['me', 'work'] });
   queryClient.invalidateQueries({ queryKey: ['global'] });
+  kickAutomations();
 }
 
 /* ==================================================================== Cards */

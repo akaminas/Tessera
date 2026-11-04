@@ -3,6 +3,7 @@ import { sb } from '@/lib/supabase';
 import { must } from './errors';
 import { qk, queryClient } from './queryClient';
 import { safeUpdate, tableBackend } from './safeUpdate';
+import { kickAutomations } from './cards';
 import type {
   ActivityEntry,
   Board,
@@ -353,6 +354,7 @@ export function useComments(projectId: string, cardId: string | undefined) {
 export async function addComment(projectId: string, cardId: string, body: string, mentions: string[]) {
   must(await sb().from('comments').insert({ card_id: cardId, project_id: projectId, body, mentions }));
   queryClient.invalidateQueries({ queryKey: qk.projectPart(projectId, 'comments', cardId) });
+  kickAutomations();
 }
 
 export async function editComment(c: Comment, body: string, mentions: string[]) {

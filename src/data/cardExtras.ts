@@ -3,10 +3,12 @@ import { sb } from '@/lib/supabase';
 import { must } from './errors';
 import { qk, queryClient } from './queryClient';
 import type { Card } from './types';
+import { kickAutomations } from './cards';
 
 const inval = (projectId: string) => {
   queryClient.invalidateQueries({ queryKey: qk.project(projectId) });
   queryClient.invalidateQueries({ queryKey: ['me', 'work'] });
+  kickAutomations();
 };
 
 /* ================================================================ Checklists */
@@ -219,12 +221,13 @@ export async function uploadAttachment(
     size_bytes: file.size,
     is_finance: Boolean(target.finance),
   };
-  const ins = await sb().from('attachments').insert(row);
+  const ins = await sb().from('attachments').insert(row).select('id').single();
   if (ins.error) {
     await sb().storage.from('attachments').remove([path]);
     throw ins.error;
   }
   inval(projectId);
+  return (ins.data as { id: string }).id;
 }
 
 export async function addLinkAttachment(
