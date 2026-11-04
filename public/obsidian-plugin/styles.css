@@ -1,0 +1,2 @@
+.tessera-code textarea { width: 100%; min-height: 4.5em; font-family: var(--font-monospace); font-size: var(--font-smallest); }
+.tessera-muted { color: var(--text-muted); font-size: var(--font-ui-smaller); }

@@ -22,7 +22,7 @@ Browser (GitHub Pages, static)                Supabase (managed or self-hosted)
 | Domain (pure TypeScript) | `src/domain` | Ordering keys, filters, recurrence, quick-add parsing, timeline maths, finance engine (big.js), workbook parsing, automation descriptions. Unit-tested without a backend. |
 | Data access | `src/data` | Supabase queries and mutations, optimistic cache updates, conflict-safe updates (`safeUpdate`), realtime subscription. Query-key conventions drive invalidation. |
 | Persistence and rules | `supabase/migrations` | Schema, integrity triggers, permission helpers, RLS policies, RPCs, automation engine. Tested against real PostgreSQL (`tests/db`). |
-| Integrations | `supabase/functions`, `src/lib/github.ts`, `src/lib/ical.ts`, `src/lib/exporters.ts` | iCalendar feed and export, email digest, GitHub link status, XLSX/CSV/PDF export. |
+| Integrations | `supabase/functions`, `integrations/obsidian`, `src/lib/github.ts`, `src/lib/ical.ts`, `src/lib/exporters.ts` | iCalendar feed and export, email digest, GitHub link status, XLSX/CSV/PDF export, Obsidian plugin (talks to database functions with a personal access key, no extra server). |
 
 ## Data flow for a change
 1. The user drags a card. The cache updates immediately (optimistic).

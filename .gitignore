@@ -16,3 +16,6 @@ supabase/.branches/
 *.xls
 instructions*.txt
 *.url
+
+# Obsidian plugin build output (the published copy lives in public/obsidian-plugin)
+integrations/obsidian/main.js

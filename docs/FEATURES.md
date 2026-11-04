@@ -112,6 +112,7 @@
 | The six example automations from the brief | Complete | One-click presets. |
 | Outgoing webhooks (generic, Slack, Teams) with HMAC signatures | Complete | Delivery uses pg_net on hosted Supabase. Locally the queueing and signatures are tested, and the "no pg_net" path fails clearly. |
 | iCalendar subscription feed (works with Google Calendar "From URL") | Complete | Edge Function `ical`. |
+| Obsidian plugin: send tasks from notes, create a project from a note, tick boxes for tasks done in Tessera | Complete (needs the 0009 migration) | Personal access keys (Settings → Obsidian); source in `integrations/obsidian`. One-way: Tessera is not edited from Obsidian after sending, except dates, priority and completion written in the note. |
 | GitHub issue / PR links with live status | Partial | Public repositories only (unauthenticated GitHub API, 60 requests per hour). |
 | Google Drive document links | Complete | Recognised and shown as Drive documents. No Drive API browsing. |
 | Email notifications (digest) | Partial | Edge Function implemented; needs an email provider key (Resend) and a scheduled call to be configured. |

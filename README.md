@@ -17,7 +17,7 @@ Tessera combines a Trello-style board for everyday work with the planning, repor
 | Comments with @mentions, watchers, notifications, activity history | Meetings: agendas, minutes, decisions, action items that become tasks | Person-months planned and actual, timesheets, personnel cost reconciliation |
 | Table, calendar, timeline / Gantt, dashboard, map and My Work views | Reporting periods, workload across people and projects | KPI registry with targets, measurements, verification and evidence |
 | Quick capture, personal inbox, focus mode, undo, keyboard shortcuts | Templates for nine kinds of project, plus your own | Excel import (plan and budget) with review and reconciliation; XLSX, CSV and PDF exports |
-| Real-time collaboration with conflict-safe editing | Server-side automations: rules, schedules, due-date rules, buttons | Signed webhooks (generic, Slack, Teams), iCalendar feed, GitHub link status |
+| Real-time collaboration with conflict-safe editing | Server-side automations: rules, schedules, due-date rules, buttons | Signed webhooks (generic, Slack, Teams), iCalendar feed, GitHub link status, Obsidian plugin |
 
 ## How it is built
 - **Frontend:** React 19, TypeScript, Vite, Tailwind CSS 4, React Router, TanStack Query, dnd-kit and Radix primitives, styled with theme tokens in `src/styles/theme.css`. Hosted on GitHub Pages.

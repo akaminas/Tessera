@@ -70,6 +70,8 @@ workspaces ─┬─ workspace_members (role, organisation)
 | `apply_blueprint`, `project_to_blueprint`, `import_plan`, `import_budget` | Templates and workbook imports (atomic). |
 | `run_scheduler`, `process_automation_queue`, `run_time_rules`, `deliver_webhooks`, `run_button`, `run_rule_now`, `kick_automations` | Automation. |
 | `calendar_feed(token)` | iCalendar data for the Edge Function (service role only). |
+| `create_integration_token(name)` | Creates a personal access key for outside tools and returns it once; only its SHA-256 hash is stored in `integration_tokens`. |
+| `obsidian_context`, `obsidian_create_project`, `obsidian_send_tasks`, `obsidian_card_status` | Called by the Obsidian plugin with an access key. Each resolves the key to its owner and runs as that person, so the usual permission checks and activity records apply. Callable without a session; the key is the credential. |
 
 ## Backup and restore
 - **Managed Supabase:**

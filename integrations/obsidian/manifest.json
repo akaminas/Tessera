@@ -1,0 +1,9 @@
+{
+  "id": "tessera",
+  "name": "Tessera",
+  "version": "0.1.0",
+  "minAppVersion": "1.4.0",
+  "description": "Send tasks from your notes to Tessera, create Tessera projects from notes, and tick boxes when tasks are done there.",
+  "author": "Tessera",
+  "isDesktopOnly": false
+}

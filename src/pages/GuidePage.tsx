@@ -163,11 +163,24 @@ const SECTIONS: GuideSection[] = [
     ],
   },
   {
+    id: 'obsidian',
+    title: '13. Send tasks from Obsidian',
+    intro: 'If you keep notes in Obsidian, the Tessera plugin turns the tasks in a note into tasks here.',
+    steps: [
+      <>Open <B>Settings → Obsidian</B>, download the three plugin files into a <B>tessera</B> folder inside your vault’s <B>.obsidian/plugins</B> folder, and enable <B>Tessera</B> in Obsidian’s Community plugins.</>,
+      <>Click <B>Create key</B>, copy the connection code it shows once, and paste it into Obsidian under <B>Settings → Tessera</B>.</>,
+      <>In a note, open the command palette and choose <B>Send the tasks in this note to Tessera</B>. Each open task (<B>- [ ] text</B>) becomes a task on the list you pick, and a small ↗ link appears on the line.</>,
+      <>Dates and priorities written the way the Tasks plugin does (📅 2026-11-20, ⏫) come along. Send again after editing and the task is updated, not duplicated.</>,
+      <>Choose <B>Create a Tessera project from this note</B> to start a project from a note, or <B>Tick boxes in this note for tasks done in Tessera</B> to bring completed tasks back.</>,
+      <>The key can do only what you can do. Delete it on the same Settings page to disconnect a vault at any time.</>,
+    ],
+  },
+  {
     id: 'appearance',
-    title: '13. Settings and appearance',
+    title: '14. Settings and appearance',
     intro: 'The menu under your initials (top right, ▾) holds your settings, the theme and this guide.',
     steps: [
-      <>Choose <B>Settings</B> for your profile, preferences, notifications, calendar feed and data export.</>,
+      <>Choose <B>Settings</B> for your profile, preferences, notifications, calendar feed, Obsidian connection and data export.</>,
       <>Choose <B>Dark theme</B> or <B>Light theme</B> to switch at once. Light is the default; <B>Settings → Preferences</B> can also follow your computer’s setting.</>,
       <>Under <B>Preferences</B> you can make lists denser, reduce motion and turn keyboard shortcuts off.</>,
       <>Both themes use colours chosen to stay clear for people with red-green colour blindness.</>,
@@ -198,7 +211,7 @@ export default function GuidePage() {
       <nav aria-label="Guide contents" className="sticky top-6 hidden h-fit w-56 shrink-0 lg:block">
         <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-secondary">Contents</p>
         <ol className="flex flex-col gap-0.5 text-sm">
-          {[...SECTIONS, { id: 'shortcuts', title: '14. Keyboard shortcuts' }].map((s) => (
+          {[...SECTIONS, { id: 'shortcuts', title: '15. Keyboard shortcuts' }].map((s) => (
             <li key={s.id}>
               <button className="w-full rounded-[4px] px-2 py-1 text-left text-secondary hover:bg-hover hover:text-ink" onClick={() => go(s.id)}>
                 {s.title}
@@ -251,7 +264,7 @@ export default function GuidePage() {
 
           <section id="guide-shortcuts" aria-labelledby="guide-shortcuts-h" className="scroll-mt-6">
             <h2 id="guide-shortcuts-h" className="text-xl">
-              14. Keyboard shortcuts
+              15. Keyboard shortcuts
             </h2>
             <p className="mt-1 text-secondary">Point at a task and press a key. Press ? at any time for the full list.</p>
             <table className="mt-4 w-full max-w-xl text-sm">

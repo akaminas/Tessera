@@ -12,6 +12,7 @@ import { applyUiPrefs, readUiPrefs } from '@/lib/prefs';
 import { Button, Checkbox, Field, Input, PageHeader, Select } from '@/components/ui';
 import { useToast } from '@/components/ui/Toast';
 import { useShortcutSettings } from '@/layout/shortcuts';
+import { ObsidianSettings } from './ObsidianSettings';
 import { cn } from '@/lib/cn';
 import { FAMILIES, type Family, type UserPreferences } from '@/data/types';
 
@@ -20,6 +21,7 @@ const TABS = [
   { id: 'preferences', label: 'Preferences' },
   { id: 'notifications', label: 'Notifications' },
   { id: 'calendar', label: 'Calendar feed' },
+  { id: 'obsidian', label: 'Obsidian' },
   { id: 'data', label: 'Your data' },
   { id: 'account', label: 'Account' },
 ];
@@ -40,6 +42,7 @@ export default function SettingsPage() {
       {tab === 'preferences' && <Preferences />}
       {tab === 'notifications' && <Notifications />}
       {tab === 'calendar' && <CalendarFeed />}
+      {tab === 'obsidian' && <ObsidianSettings />}
       {tab === 'data' && <YourData />}
       {tab === 'account' && <Account />}
     </div>
