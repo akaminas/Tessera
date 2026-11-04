@@ -42,6 +42,8 @@
   --color-link: var(--t-link);
   --color-list: var(--t-list);
   --color-tile: var(--t-tile);
+  --color-canvas: var(--v-canvas);
+  --color-bar: var(--t-bar);
   --font-title: var(--v-font-title);
   --font-sans: var(--v-font-body);
   --font-mono: var(--v-font-mono);
@@ -222,4 +224,79 @@
   body {
     background: #fff;
   }
+}
+
+/* ------------------------------------------------------------------------
+ * App frame: the top bar is always light-on-dark (deep blue, or translucent
+ * over a board photo). Unlayered so it wins over component utilities.
+ * --------------------------------------------------------------------- */
+.top-bar {
+  color: #fff;
+}
+.top-bar :is(a, button):not(.bar-cta) {
+  color: #fff;
+}
+.top-bar :is(a, button):not(.bar-cta):hover,
+.top-bar :is(a, button)[aria-expanded='true']:not(.bar-cta),
+.top-bar a.active {
+  background-color: rgba(255, 255, 255, 0.18);
+}
+.top-bar .bar-cta {
+  background: var(--t-bar-cta);
+  color: var(--t-bar-cta-ink);
+  border-color: transparent;
+}
+.top-bar .bar-cta:hover {
+  filter: brightness(0.95);
+}
+.top-bar input[type='search'],
+.top-bar .bar-search {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
+.top-bar .bar-search::placeholder {
+  color: rgba(255, 255, 255, 0.8);
+}
+.top-bar .bar-search:focus {
+  background: var(--v-surface);
+  color: var(--v-ink);
+  border-color: var(--t-focus);
+}
+.top-bar .bar-search:focus::placeholder {
+  color: var(--v-muted);
+}
+.top-bar .bar-search-icon {
+  color: rgba(255, 255, 255, 0.85);
+}
+.top-bar form:focus-within .bar-search-icon {
+  color: var(--v-muted);
+}
+
+/* On a board with a photo, the project header sits on the photo too. */
+.shell-on-image .project-bar {
+  background: rgba(0, 0, 0, 0.28);
+  border-color: transparent;
+  color: #fff;
+  backdrop-filter: blur(2px);
+}
+.shell-on-image .project-bar :is(h1, a, button, span) {
+  color: #fff;
+}
+.shell-on-image .project-bar .text-secondary {
+  color: rgba(255, 255, 255, 0.85);
+}
+.shell-on-image .project-bar nav a.active {
+  border-color: #fff;
+}
+.shell-on-image .project-bar button:hover,
+.shell-on-image .project-bar nav a:hover {
+  background-color: rgba(255, 255, 255, 0.16);
+}
+
+/* White panels on the grey canvas. */
+.panel {
+  background: var(--v-surface);
+  border-radius: 12px;
+  box-shadow: var(--t-panel-shadow);
 }

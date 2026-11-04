@@ -57,6 +57,13 @@
   --t-selected: #ddf4ff;
   --t-link: #0969da;
 
+  /* App frame: a deep blue top bar over a soft grey canvas with white panels */
+  --t-bar: #0550ae;
+  --t-bar-cta: #ffffff;
+  --t-bar-cta-ink: #0550ae;
+  --v-canvas: #f3f5f8;
+  --t-panel-shadow: 0 1px 2px rgba(9, 30, 66, 0.08), 0 0 0 1px rgba(9, 30, 66, 0.06);
+
   /* Board: list panels and cards */
   --t-list: #f1f2f4;
   --t-tile: #ffffff;
@@ -109,6 +116,12 @@
   --t-hover: #1c232c;
   --t-selected: #12263f;
   --t-link: #4493f8;
+
+  --t-bar: #1b222c;
+  --t-bar-cta: #1f6feb;
+  --t-bar-cta-ink: #ffffff;
+  --v-canvas: #010409;
+  --t-panel-shadow: 0 0 0 1px #3d444d;
 
   --t-list: #161b22;
   --t-tile: #262c36;

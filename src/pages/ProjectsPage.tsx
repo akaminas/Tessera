@@ -73,11 +73,11 @@ export default function ProjectsPage() {
             <li key={p.id} className="relative">
               <Link
                 to={`/p/${p.id}`}
-                className="group block h-24 overflow-hidden rounded-[8px] shadow-[var(--t-tile-shadow)] outline-none focus-visible:ring-2 focus-visible:ring-teal"
+                className="group block h-28 overflow-hidden rounded-[10px] shadow-[0_2px_6px_rgba(9,30,66,0.18)] outline-none transition-transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-teal"
                 style={bg.style}
               >
-                <span className={cn('flex h-full flex-col justify-between p-2.5', bg.onImage ? 'bg-black/20 text-white group-hover:bg-black/30' : 'text-ink group-hover:bg-black/5')}>
-                  <span className="line-clamp-2 font-semibold leading-snug [text-shadow:0_1px_2px_rgba(0,0,0,0.35)]">{p.name}</span>
+                <span className={cn('flex h-full flex-col justify-between p-2.5', bg.onImage ? 'bg-black/30 text-white group-hover:bg-black/40' : 'text-ink group-hover:bg-black/5')}>
+                  <span className="line-clamp-2 text-[15px] font-bold leading-snug [text-shadow:0_1px_2px_rgba(0,0,0,0.4)]">{p.name}</span>
                   <span className="flex items-center gap-1.5 text-xs opacity-90">
                     <span className={cn('size-2 rounded-[2px]', familyBar[p.color])} aria-hidden />
                     {p.acronym || STATUS_LABEL[p.status]}
@@ -97,7 +97,7 @@ export default function ProjectsPage() {
           <li>
             <button
               onClick={() => setParams({ new: '1' })}
-              className="grid h-24 w-full place-items-center rounded-[8px] bg-card text-sm text-secondary hover:bg-hover hover:text-ink"
+              className="panel grid h-28 w-full place-items-center text-sm font-medium text-secondary hover:text-ink"
             >
               Create new project
             </button>
@@ -200,7 +200,7 @@ export function NewProjectDialog({ workspaceId, onClose }: { workspaceId: string
           <Field label="Project name" htmlFor="np-name">
             <Input id="np-name" autoFocus value={name} onChange={(e) => setName(e.target.value)} maxLength={200} />
           </Field>
-          <Field label="Short name or acronym" htmlFor="np-acr" hint="Optional. Shown in the sidebar.">
+          <Field label="Short name or acronym" htmlFor="np-acr" hint="Optional. Shown on the project tile.">
             <Input id="np-acr" value={acronym} onChange={(e) => setAcronym(e.target.value)} maxLength={30} />
           </Field>
           <Field label="Start date" htmlFor="np-start" hint={end ? `Template length ${duration} months: ends ${format(parseISO(end), 'd MMM yyyy')}. Template dates are placed relative to this start.` : 'Template dates are placed relative to this start.'}>

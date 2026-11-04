@@ -4,6 +4,18 @@ Tessera should feel instantly familiar to anyone who has used Trello: calm, uncl
 
 This replaces the original brief's Vellum design system, at the product owner's request.
 
+## Layout
+
+The frame is deliberately simple, so anyone can find their way at a glance:
+
+- **One top bar, no sidebar.** Logo, workspace switcher, then Home, My Work, Projects (a menu listing the workspace's projects and bookmarks), Calendar and Reports. Search, Add task, the notification bell and the account menu sit on the right. Below 1024px wide the links fold into a single menu button.
+- **The bar is deep blue** (`--t-bar`) on ordinary pages, with white text and a white "Add task" button. In the dark theme it is a dark grey distinct from the canvas.
+- **On a board with a photo**, the photo fills the whole window. The top bar, project header and board bar become translucent dark layers over it (`useShellBackground`, `.shell-on-image`).
+- **Other pages** use a soft grey canvas (`--v-canvas`) with content in white panels (`.panel`, used by every `Section`).
+- **Projects** are photo tiles: the first board's background under a dark overlay, with the name in bold white.
+
+The approach was inspired by the open-source knowankit/trello-clone (top bar over a full-bleed board photo, photo tiles, white panels), adapted to Tessera's colour-blind-safe palette and type.
+
 ## Colour
 - **Neutrals, accent and status** follow GitHub Primer's *Protanopia & Deuteranopia* light and dark themes:
   - The page is white (`#0d1117` in dark), with panels in Primer's subtle grey and hairlines in its border grey.

@@ -27,7 +27,7 @@ const SECTIONS: GuideSection[] = [
     steps: [
       <>Sign in, or create an account with your email address. You can also ask for a one-time sign-in link.</>,
       <>The first time, type a name under <B>Create a workspace</B> (for example your office or team) and press <B>Create workspace</B>.</>,
-      <>To invite colleagues, open <B>Workspace</B> in the left menu, choose <B>Members</B>, enter their email under <B>Invite someone</B> and press <B>Create invitation</B>.</>,
+      <>To invite colleagues, click your workspace’s name in the top bar, choose <B>Members and settings</B>, then <B>Members</B>, enter their email under <B>Invite someone</B> and press <B>Create invitation</B>.</>,
       <>Copy the invitation link and send it to them. They sign in with that same email address and press <B>Accept invitation</B>.</>,
     ],
     tips: [<>Invitations only work for the email address they were created for.</>],
@@ -37,7 +37,7 @@ const SECTIONS: GuideSection[] = [
     title: '2. Create a project',
     intro: 'Each project has its own boards, people and, if you need them, project-management modules.',
     steps: [
-      <>Open <B>Projects</B> in the left menu and press <B>New project</B> (or the <B>+</B> next to <B>Projects</B> in the sidebar).</>,
+      <>Open <B>Projects</B> in the top bar and choose <B>New project</B>.</>,
       <>Give it a name and pick a <B>Template</B>. <B>Blank project</B> gives you one board with <B>To do</B>, <B>Doing</B> and <B>Done</B>.</>,
       <>Press <B>Create project</B>. The project opens on its board, ready for tasks.</>,
       <>Project managers can show or hide whole areas (Timeline, Budget, Risks and so on) with the <B>sliders icon</B> at the top right of the project.</>,
@@ -102,7 +102,7 @@ const SECTIONS: GuideSection[] = [
       <><B>My Work</B> lists everything assigned to you, including checklist items, grouped by when it is due.</>,
       <><B>Inbox</B> holds notifications, quick captures waiting to be sorted, and invitations.</>,
       <>Press <B>Add task</B> at the top (or <Kbd>q</Kbd>) from anywhere. Shorthand works in the title: <B>tomorrow</B>, <B>fri</B>, <B>+10d</B> or <B>2027-01-15</B> set the due date, and <B>!high</B> or <B>!urgent</B> set the priority.</>,
-      <><B>Calendar</B> in the left menu shows dated work from all your projects.</>,
+      <><B>Calendar</B> in the top bar shows dated work from all your projects.</>,
     ],
     tips: [<>Press <Kbd>F</Kbd> (Shift + f) for focus mode, which hides navigation and notifications.</>],
   },
@@ -127,7 +127,7 @@ const SECTIONS: GuideSection[] = [
       <><B>Milestones</B>: deliverables and milestones with due months, evidence and approval.</>,
       <><B>Budget</B> and <B>KPIs</B>: partners, budget lines, spending, person-months and indicators. Only people with finance access see the money.</>,
       <><B>Risks &amp; issues</B> and <B>Meetings</B>: a risk register, and agendas whose action items become tasks.</>,
-      <><B>Reports</B> in the left menu brings status, progress, KPIs, effort and finance together, with PDF and Excel export.</>,
+      <><B>Reports</B> in the top bar brings status, progress, KPIs, effort and finance together, with PDF and Excel export.</>,
     ],
   },
   {

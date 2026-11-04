@@ -9,11 +9,12 @@ export function LogoMark({ size = 22 }: { size?: number }) {
   );
 }
 
-export function Logo({ compact }: { compact?: boolean }) {
+/** `onDark`: white wordmark, for the top bar. */
+export function Logo({ compact, onDark, className }: { compact?: boolean; onDark?: boolean; className?: string }) {
   return (
-    <span className="inline-flex items-center gap-2">
+    <span className={className ?? 'inline-flex items-center gap-2'} style={className ? { alignItems: 'center', gap: '0.5rem' } : undefined}>
       <LogoMark />
-      {!compact && <span className="font-title text-xl leading-none text-ink">Tessera</span>}
+      {!compact && <span className={onDark ? 'font-title text-lg font-bold leading-none text-white' : 'font-title text-xl leading-none text-ink'}>Tessera</span>}
     </span>
   );
 }

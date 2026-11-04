@@ -23,12 +23,12 @@ const STEPS: Step[] = [
   {
     target: 'nav',
     title: 'Find your way',
-    body: 'Home shows what matters today. My Work lists everything assigned to you, and Inbox collects your notifications.',
+    body: 'Everything is one click away in the top bar. Home shows what matters today, My Work lists everything assigned to you, and Calendar and Reports look across all your projects.',
   },
   {
     target: 'projects',
     title: 'Your projects',
-    body: 'Each project has a board of lists and tasks. Press + to start a new project from a template.',
+    body: 'Open any project from this menu, see them all, or start a new one from a template. Each project has a board of lists and tasks.',
   },
   {
     title: 'Boards in a nutshell',
@@ -52,7 +52,7 @@ const STEPS: Step[] = [
   {
     target: 'workspace',
     title: 'Your workspace',
-    body: 'Switch workspaces here. To invite colleagues, open Workspace in the menu and choose Members.',
+    body: 'This is your workspace. Switch workspaces here, or choose Members and settings to invite colleagues.',
   },
   {
     target: 'account',
@@ -74,7 +74,7 @@ function visibleRect(name: string | undefined): DOMRect | null {
   const el = document.querySelector<HTMLElement>(`[data-tour="${name}"]`);
   if (!el) return null;
   const r = el.getBoundingClientRect();
-  // Hidden (e.g. the sidebar on a phone) or off-screen: fall back to a centred card.
+  // Hidden (e.g. top-bar links folded away on a phone) or off-screen: fall back to a centred card.
   if (r.width === 0 || r.height === 0 || r.right <= 0 || r.left >= window.innerWidth) return null;
   return r;
 }
@@ -201,7 +201,7 @@ export function Tour() {
     const spaceBelow = vh - rect.bottom;
     const spaceRight = vw - rect.right;
     if (spaceRight > W + 24 && rect.height > 120) {
-      // Tall targets in the sidebar: pop-up to the right.
+      // Tall targets: pop-up to the right.
       cardStyle = { left: rect.right + 16, top: Math.min(Math.max(12, rect.top), vh - 240) };
     } else if (spaceBelow > 220) {
       cardStyle = { top: rect.bottom + 14, left: Math.min(Math.max(12, rect.left + rect.width / 2 - W / 2), vw - W - 12) };

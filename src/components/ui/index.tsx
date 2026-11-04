@@ -427,15 +427,15 @@ export function Section({
     });
   };
   return (
-    <section className="flex flex-col gap-2">
-      <div className="flex items-center gap-2 border-b border-grid pb-1">
+    <section className="panel flex flex-col gap-3 p-4">
+      <div className="flex items-center gap-2">
         {collapsible ? (
           <button type="button" onClick={toggle} aria-expanded={open} className="flex items-center gap-1 text-left">
             {open ? <ChevronDown className="size-4 text-muted" aria-hidden /> : <ChevronRight className="size-4 text-muted" aria-hidden />}
-            <h2 className="text-lg">{title}</h2>
+            <h2 className="text-base">{title}</h2>
           </button>
         ) : (
-          <h2 className="text-lg">{title}</h2>
+          <h2 className="text-base">{title}</h2>
         )}
         {count !== undefined && <span className="text-xs text-secondary num">{count}</span>}
         <div className="ml-auto flex items-center gap-1">{actions}</div>
@@ -447,7 +447,7 @@ export function Section({
 
 export function PageHeader({ title, subtitle, actions, eyebrow }: { title: ReactNode; subtitle?: ReactNode; actions?: ReactNode; eyebrow?: ReactNode }) {
   return (
-    <header className="flex flex-wrap items-end gap-3 border-b border-grid pb-3">
+    <header className="flex flex-wrap items-end gap-3 pb-1">
       <div className="min-w-0 flex-1">
         {eyebrow && <div className="text-xs text-secondary">{eyebrow}</div>}
         <h1 className="truncate text-2xl leading-tight">{title}</h1>

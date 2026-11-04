@@ -51,7 +51,7 @@ test.describe.serial('Obsidian connection', () => {
 
     // Finishing it in Tessera shows up in the plugin's status check.
     await todo.getByText('Task from my notes', { exact: true }).click();
-    await page.getByRole('checkbox', { name: 'Mark as done' }).check();
+    await page.getByRole('checkbox', { name: 'Mark as done' }).click();
     await expect(page.getByRole('checkbox', { name: 'Mark as not done' })).toBeChecked();
     await expect(page.locator('html[data-saving]')).toHaveCount(0);
     await expect.poll(async () => (await api.cardStatus([sent[0].card_id]))[0]?.status).toBe('done');

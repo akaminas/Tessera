@@ -3,14 +3,7 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router';
 import {
   BookOpen,
   Bell,
-  BookMarked,
-  Briefcase,
-  CalendarDays,
   ChevronDown,
-  FileBarChart,
-  Home,
-  Inbox,
-  ListChecks,
   LogOut,
   Menu as MenuIcon,
   Moon,
@@ -27,28 +20,33 @@ import { useAuth } from '@/auth/AuthProvider';
 import { WorkspaceProvider, useWorkspaceCtx } from './WorkspaceContext';
 import { ShortcutProvider, useShortcuts } from './shortcuts';
 import { Logo } from './Logo';
-import { Avatar, Button, IconButton, PageLoading, familyBar } from '@/components/ui';
+import { Avatar, Button, PageLoading, familyBar } from '@/components/ui';
 import { MenuContent, MenuItem, MenuLabel, MenuRoot, MenuSeparator, MenuTrigger } from '@/components/ui/Menu';
 import { cn } from '@/lib/cn';
 import { startChangeFeed, type SyncState } from '@/data/realtime';
-import { useBookmarks, useNotifications, useRunningTimer, stopTimer, removeBookmark } from '@/data/personal';
+import { useBookmarks, useNotifications, useRunningTimer, stopTimer } from '@/data/personal';
 import { useAllProjects } from '@/data/core';
 import { applyUiPrefs, readUiPrefs, resolvedTheme } from '@/lib/prefs';
+import { boardBackground } from '@/domain/backgrounds';
 import { QuickAddDialog } from './QuickAdd';
 import { Onboarding } from './Onboarding';
 import { useToast } from '@/components/ui/Toast';
 import { FocusProvider, useFocusMode } from './focus';
 import { Tour } from './Tour';
+import { ShellBackgroundContext } from './shellBackground';
 
+/** Everything reachable from the top bar. Inbox is the bell; Settings is in the account menu. */
 const NAV = [
-  { to: '/', label: 'Home', icon: Home, end: true, keys: 'g h' },
-  { to: '/my-work', label: 'My Work', icon: ListChecks, keys: 'g m' },
-  { to: '/inbox', label: 'Inbox', icon: Inbox, keys: 'g i' },
-  { to: '/projects', label: 'Projects', icon: Briefcase, keys: 'g p' },
-  { to: '/calendar', label: 'Calendar', icon: CalendarDays, keys: 'g c' },
-  { to: '/reports', label: 'Reports', icon: FileBarChart, keys: 'g r' },
-  { to: '/workspace', label: 'Workspace', icon: Users, keys: 'g w' },
-  { to: '/settings', label: 'Settings', icon: Settings, keys: 'g s' },
+  { to: '/', label: 'Home', end: true, keys: 'g h' },
+  { to: '/my-work', label: 'My Work', keys: 'g m' },
+  { to: '/projects', label: 'Projects', keys: 'g p' },
+  { to: '/calendar', label: 'Calendar', keys: 'g c' },
+  { to: '/reports', label: 'Reports', keys: 'g r' },
+];
+const MORE_SHORTCUTS = [
+  { to: '/inbox', label: 'Inbox', keys: 'g i' },
+  { to: '/workspace', label: 'Workspace', keys: 'g w' },
+  { to: '/settings', label: 'Settings', keys: 'g s' },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -67,8 +65,8 @@ function ShellInner({ children }: { children: ReactNode }) {
   const { user, profile } = useAuth();
   const { current, workspaces, loading } = useWorkspaceCtx();
   const [sync, setSync] = useState<SyncState>('connecting');
-  const [navOpen, setNavOpen] = useState(false);
   const [quickAdd, setQuickAdd] = useState(false);
+  const [backgroundId, setBackgroundId] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
   const toast = useToast();
@@ -80,11 +78,9 @@ function ShellInner({ children }: { children: ReactNode }) {
     return startChangeFeed(user.id, setSync);
   }, [user]);
 
-  useEffect(() => setNavOpen(false), [location.pathname]);
-
   useShortcuts(
     [
-      ...NAV.map((n) => ({ keys: n.keys, description: `Go to ${n.label}`, group: 'Navigation' as const, handler: () => navigate(n.to) })),
+      ...[...NAV, ...MORE_SHORTCUTS].map((n) => ({ keys: n.keys, description: `Go to ${n.label}`, group: 'Navigation' as const, handler: () => navigate(n.to) })),
       { keys: '/', description: 'Search', group: 'General', handler: () => searchRef.current?.focus() },
       { keys: 'q', description: 'Quick add a task', group: 'General', handler: () => setQuickAdd(true) },
       {
@@ -107,37 +103,26 @@ function ShellInner({ children }: { children: ReactNode }) {
     return <Onboarding />;
   }
 
+  const bg = backgroundId ? boardBackground(backgroundId) : null;
+  const onImage = Boolean(bg?.onImage);
+
   return (
-    <div className="flex h-dvh min-h-0 flex-col">
-      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:bg-surface focus:p-2">
-        Skip to content
-      </a>
-      <TopBar
-        onMenu={() => setNavOpen((o) => !o)}
-        onQuickAdd={() => setQuickAdd(true)}
-        sync={sync}
-        searchRef={searchRef}
-        hidden={focus}
-        profileName={profile?.display_name ?? user?.email ?? ''}
-        profileColor={profile?.avatar_color ?? 'teal'}
-      />
-      <div className="flex min-h-0 flex-1">
+    <ShellBackgroundContext.Provider value={setBackgroundId}>
+      <div className={cn('flex h-dvh min-h-0 flex-col', onImage && 'shell-on-image')} style={onImage ? bg!.style : undefined}>
+        <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:bg-surface focus:p-2">
+          Skip to content
+        </a>
         {!focus && (
-          <>
-            <aside
-              className={cn(
-                'no-print scroll-thin z-30 w-60 shrink-0 overflow-y-auto border-r border-grid bg-surface',
-                'fixed inset-y-0 left-0 top-12 transition-transform lg:static lg:translate-x-0',
-                navOpen ? 'translate-x-0' : '-translate-x-full',
-              )}
-              aria-label="Main navigation"
-            >
-              <Sidebar />
-            </aside>
-            {navOpen && <div className="fixed inset-0 top-12 z-20 bg-[rgba(42,40,37,0.25)] lg:hidden" onClick={() => setNavOpen(false)} />}
-          </>
+          <TopBar
+            onQuickAdd={() => setQuickAdd(true)}
+            sync={sync}
+            searchRef={searchRef}
+            onImage={onImage}
+            profileName={profile?.display_name ?? user?.email ?? ''}
+            profileColor={profile?.avatar_color ?? 'teal'}
+          />
         )}
-        <main id="main" className="scroll-thin min-w-0 flex-1 overflow-auto">
+        <main id="main" className={cn('scroll-thin min-h-0 min-w-0 flex-1 overflow-auto', !onImage && 'bg-canvas')}>
           {focus && (
             <div className="no-print sticky top-0 z-10 flex items-center justify-between border-b border-grid bg-surface px-4 py-1.5 text-sm">
               <span className="text-secondary">Focus mode: navigation and notifications are hidden.</span>
@@ -148,10 +133,10 @@ function ShellInner({ children }: { children: ReactNode }) {
           )}
           {children}
         </main>
+        <QuickAddDialog open={quickAdd} onOpenChange={setQuickAdd} />
+        <Tour />
       </div>
-      <QuickAddDialog open={quickAdd} onOpenChange={setQuickAdd} />
-      <Tour />
-    </div>
+    </ShellBackgroundContext.Provider>
   );
 }
 
@@ -159,105 +144,117 @@ function ShellInner({ children }: { children: ReactNode }) {
 function SyncIndicator({ state }: { state: SyncState }) {
   if (state !== 'offline') return null;
   return (
-    <span className="inline-flex items-center gap-1.5 text-xs text-secondary" role="status" title="Live updates paused. Data refreshes when you return to the tab.">
-      <span className="size-2 rounded-full bg-critical" aria-hidden />
+    <span className="inline-flex items-center gap-1.5 text-xs" role="status" title="Live updates paused. Data refreshes when you return to the tab.">
+      <span className="size-2 rounded-full bg-[var(--v-status-critical)]" aria-hidden />
       Offline
     </span>
   );
 }
 
+const barButton = 'inline-flex h-8 items-center gap-1 rounded-[6px] px-2.5 text-sm font-medium';
+
 function TopBar({
-  onMenu,
   onQuickAdd,
   sync,
   searchRef,
-  hidden,
+  onImage,
   profileName,
   profileColor,
 }: {
-  onMenu: () => void;
   onQuickAdd: () => void;
   sync: SyncState;
   searchRef: React.RefObject<HTMLInputElement | null>;
-  hidden: boolean;
+  onImage: boolean;
   profileName: string;
   profileColor: import('@/data/types').Family;
 }) {
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
   const [q, setQ] = useState('');
-  const notifications = useNotifications(!hidden);
+  const notifications = useNotifications(true);
   const unread = (notifications.data ?? []).filter((n) => !n.read_at).length;
   const timer = useRunningTimer(user?.id);
   const toast = useToast();
   const [theme, setTheme] = useState(() => resolvedTheme(readUiPrefs().theme));
 
   return (
-    <header className="no-print flex h-12 shrink-0 items-center gap-2 border-b border-grid bg-surface px-2 sm:px-3">
-      <IconButton label="Toggle navigation" className="lg:hidden" onClick={onMenu}>
-        <MenuIcon className="size-5" />
-      </IconButton>
-      <Link to="/" className="mr-2 hidden sm:block" aria-label="Tessera home">
-        <Logo />
+    <header
+      className={cn(
+        'top-bar no-print relative z-20 flex h-12 shrink-0 items-center gap-1 px-2 sm:px-3',
+        onImage ? 'bg-black/35 backdrop-blur-[3px]' : 'bg-bar',
+      )}
+    >
+      <PhoneMenu />
+      <Link to="/" className={cn(barButton, 'mr-1 px-1.5')} aria-label="Tessera home">
+        <Logo onDark className="hidden sm:inline-flex" />
+        <Logo onDark compact className="sm:hidden" />
       </Link>
-      <Link to="/" className="sm:hidden" aria-label="Tessera home">
-        <Logo compact />
-      </Link>
+      <WorkspaceMenu />
+
+      <nav aria-label="Main" data-tour="nav" className="hidden items-center gap-0.5 lg:flex">
+        {NAV.map((n) =>
+          n.to === '/projects' ? (
+            <ProjectsMenu key={n.to} />
+          ) : (
+            <NavLink key={n.to} to={n.to} end={n.end} className={barButton}>
+              {n.label}
+            </NavLink>
+          ),
+        )}
+      </nav>
+
       <form
         role="search"
         data-tour="search"
-        className="relative max-w-md flex-1"
+        className="relative ml-auto min-w-0 flex-1 sm:w-56 sm:flex-none lg:w-64"
         onSubmit={(e) => {
           e.preventDefault();
           if (q.trim()) navigate(`/search?q=${encodeURIComponent(q.trim())}`);
         }}
       >
-        <Search className="pointer-events-none absolute left-2 top-1/2 size-4 -translate-y-1/2 text-muted" aria-hidden />
+        <Search className="bar-search-icon pointer-events-none absolute left-2 top-1/2 size-4 -translate-y-1/2" aria-hidden />
         <input
           ref={searchRef}
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search tasks, projects, comments"
+          placeholder="Search"
           aria-label="Search"
-          className="h-8 w-full rounded-[4px] border border-grid bg-surface pl-8 pr-2 text-sm placeholder:text-muted focus:border-teal focus:outline-none"
+          className="bar-search h-8 w-full rounded-[6px] border pl-8 pr-2 text-sm focus:outline-none"
         />
       </form>
-      <div className="ml-auto flex items-center gap-1 sm:gap-2">
+
+      <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
         {timer.data && (
-          <Button
-            size="sm"
-            variant="secondary"
-            icon={<Square className="size-3.5" />}
+          <button
+            className={barButton}
             title="Stop timer"
             onClick={() => stopTimer(timer.data!).then(() => toast.show('Timer stopped and time logged')).catch(toast.error)}
           >
+            <Square className="size-3.5" aria-hidden />
             <Timer className="size-3.5" aria-hidden />
             <TimerClock since={timer.data.started_at!} />
             <span className="hidden max-w-[140px] truncate md:inline">{timer.data.cards?.title}</span>
-          </Button>
+          </button>
         )}
         <SyncIndicator state={sync} />
-        <Button size="sm" variant="primary" icon={<Plus className="size-4" />} onClick={onQuickAdd} title="Quick add (q)" data-tour="add-task">
+        <button className={cn(barButton, 'bar-cta')} onClick={onQuickAdd} title="Add a task (q)" data-tour="add-task">
+          <Plus className="size-4" aria-hidden />
           <span className="hidden sm:inline">Add task</span>
-        </Button>
-        <Link
-          to="/inbox"
-          className="relative inline-flex size-8 items-center justify-center rounded-[4px] text-secondary hover:bg-hover"
-          aria-label={unread ? `Inbox, ${unread} unread` : 'Inbox'}
-          data-tour="inbox"
-        >
+          <span className="sr-only sm:hidden">Add task</span>
+        </button>
+        <Link to="/inbox" className={cn(barButton, 'relative w-8 justify-center px-0')} aria-label={unread ? `Inbox, ${unread} unread` : 'Inbox'} data-tour="inbox">
           <Bell className="size-4" />
           {unread > 0 && (
-            <span className="absolute -right-0.5 -top-0.5 min-w-4 rounded-full bg-terracotta px-1 text-center text-[10px] leading-4 text-white">
+            <span className="absolute -right-0.5 -top-0.5 min-w-4 rounded-full bg-[var(--v-status-serious)] px-1 text-center text-[10px] font-semibold leading-4 text-white">
               {unread > 99 ? '99+' : unread}
             </span>
           )}
         </Link>
         <MenuRoot>
           <MenuTrigger asChild>
-            <button className="flex items-center gap-1 rounded-[4px] p-1 hover:bg-hover" aria-label="Account menu" data-tour="account">
+            <button className="flex items-center gap-1 rounded-[6px] p-1" aria-label="Account menu" data-tour="account">
               <Avatar name={profileName} color={profileColor} size={26} />
-              <ChevronDown className="hidden size-3.5 text-muted sm:block" />
+              <ChevronDown className="hidden size-3.5 opacity-80 sm:block" />
             </button>
           </MenuTrigger>
           <MenuContent>
@@ -289,6 +286,140 @@ function TopBar({
   );
 }
 
+/** Current workspace: switch, open its members and settings, or start another. */
+function WorkspaceMenu() {
+  const { current, workspaces, setCurrent } = useWorkspaceCtx();
+  const navigate = useNavigate();
+  return (
+    <MenuRoot>
+      <MenuTrigger asChild>
+        <button data-tour="workspace" className="hidden h-8 max-w-[12rem] items-center gap-1 rounded-[6px] px-2.5 text-sm font-medium md:inline-flex" aria-label={`Workspace: ${current?.name}`}>
+          <span className="truncate">{current?.name}</span>
+          <ChevronDown className="size-3.5 shrink-0 opacity-80" aria-hidden />
+        </button>
+      </MenuTrigger>
+      <MenuContent align="start">
+        <MenuLabel>Workspaces</MenuLabel>
+        {workspaces.map((w) => (
+          <MenuItem key={w.id} onSelect={() => setCurrent(w.id)} icon={w.id === current?.id ? <span aria-hidden>•</span> : null}>
+            {w.name}
+          </MenuItem>
+        ))}
+        <MenuSeparator />
+        <MenuItem icon={<Users className="size-4" />} onSelect={() => navigate('/workspace')}>
+          Members and settings
+        </MenuItem>
+        <MenuItem icon={<Plus className="size-4" />} onSelect={() => navigate('/workspace?new=1')}>
+          New workspace
+        </MenuItem>
+      </MenuContent>
+    </MenuRoot>
+  );
+}
+
+function useWorkspaceProjectList() {
+  const { current } = useWorkspaceCtx();
+  const projects = useAllProjects();
+  return useMemo(
+    () => (projects.data ?? []).filter((p) => p.workspace_id === current?.id && !p.personal_owner && !p.archived_at),
+    [projects.data, current?.id],
+  );
+}
+
+/** "Projects ▾": jump to any project or bookmark, see all, or start one. */
+function ProjectsMenu() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const list = useWorkspaceProjectList();
+  const bookmarks = useBookmarks();
+  const active = location.pathname.startsWith('/projects') || location.pathname.startsWith('/p/');
+  return (
+    <MenuRoot>
+      <MenuTrigger asChild>
+        <button className={cn(barButton, active && 'bg-white/20')} data-tour="projects">
+          Projects <ChevronDown className="size-3.5 opacity-80" aria-hidden />
+        </button>
+      </MenuTrigger>
+      <MenuContent align="start" className="max-h-[70vh] w-72 overflow-y-auto">
+        {list.length > 0 && <MenuLabel>Projects</MenuLabel>}
+        {list.slice(0, 12).map((p) => (
+          <MenuItem key={p.id} onSelect={() => navigate(`/p/${p.id}`)} icon={<span className={cn('size-3 rounded-[3px]', familyBar[p.color])} aria-hidden />}>
+            <span className="truncate">{p.name}</span>
+          </MenuItem>
+        ))}
+        {(bookmarks.data?.length ?? 0) > 0 && (
+          <>
+            <MenuSeparator />
+            <MenuLabel>Bookmarks</MenuLabel>
+            {bookmarks.data!.slice(0, 8).map((b) =>
+              b.kind === 'url' ? (
+                <MenuItem key={b.id} onSelect={() => window.open(b.url!, '_blank', 'noopener,noreferrer')}>
+                  {b.label || b.url}
+                </MenuItem>
+              ) : (
+                <MenuItem key={b.id} onSelect={() => navigate(bookmarkHref(b))}>
+                  {b.label}
+                </MenuItem>
+              ),
+            )}
+          </>
+        )}
+        {list.length > 0 && <MenuSeparator />}
+        <MenuItem onSelect={() => navigate('/projects')}>All projects</MenuItem>
+        <MenuItem icon={<Plus className="size-4" />} onSelect={() => navigate('/projects?new=1')}>
+          New project
+        </MenuItem>
+      </MenuContent>
+    </MenuRoot>
+  );
+}
+
+/** On narrow screens the navigation folds into one menu. */
+function PhoneMenu() {
+  const navigate = useNavigate();
+  const { current, workspaces, setCurrent } = useWorkspaceCtx();
+  const list = useWorkspaceProjectList();
+  return (
+    <MenuRoot>
+      <MenuTrigger asChild>
+        <button className={cn(barButton, 'w-8 justify-center px-0 lg:hidden')} aria-label="Toggle navigation">
+          <MenuIcon className="size-5" />
+        </button>
+      </MenuTrigger>
+      <MenuContent align="start" className="max-h-[80vh] w-64 overflow-y-auto">
+        {[...NAV, { to: '/inbox', label: 'Inbox' }].map((n) => (
+          <MenuItem key={n.to} onSelect={() => navigate(n.to)}>
+            {n.label}
+          </MenuItem>
+        ))}
+        {list.length > 0 && (
+          <>
+            <MenuSeparator />
+            <MenuLabel>Projects</MenuLabel>
+            {list.slice(0, 8).map((p) => (
+              <MenuItem key={p.id} onSelect={() => navigate(`/p/${p.id}`)} icon={<span className={cn('size-3 rounded-[3px]', familyBar[p.color])} aria-hidden />}>
+                <span className="truncate">{p.name}</span>
+              </MenuItem>
+            ))}
+          </>
+        )}
+        <MenuSeparator />
+        <MenuLabel>Workspace: {current?.name}</MenuLabel>
+        {workspaces
+          .filter((w) => w.id !== current?.id)
+          .map((w) => (
+            <MenuItem key={w.id} onSelect={() => setCurrent(w.id)}>
+              Switch to {w.name}
+            </MenuItem>
+          ))}
+        <MenuItem icon={<Users className="size-4" />} onSelect={() => navigate('/workspace')}>
+          Members and settings
+        </MenuItem>
+      </MenuContent>
+    </MenuRoot>
+  );
+}
+
 function TimerClock({ since }: { since: string }) {
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
@@ -300,121 +431,6 @@ function TimerClock({ since }: { since: string }) {
   const m = Math.floor((secs % 3600) / 60);
   const s = secs % 60;
   return <span className="num">{h > 0 ? `${h}:${String(m).padStart(2, '0')}` : m}:{String(s).padStart(2, '0')}</span>;
-}
-
-function Sidebar() {
-  const { current, workspaces, setCurrent } = useWorkspaceCtx();
-  const navigate = useNavigate();
-  const bookmarks = useBookmarks();
-  const projects = useAllProjects();
-  const notifications = useNotifications();
-  const unread = (notifications.data ?? []).filter((n) => !n.read_at).length;
-  const wsProjects = useMemo(
-    () => (projects.data ?? []).filter((p) => p.workspace_id === current?.id && !p.personal_owner),
-    [projects.data, current?.id],
-  );
-
-  return (
-    <nav className="flex flex-col gap-4 p-3 text-sm">
-      <MenuRoot>
-        <MenuTrigger asChild>
-          <button data-tour="workspace" className="flex w-full items-center gap-2 rounded-[4px] border border-grid px-2 py-1.5 text-left hover:bg-hover">
-            <span className="min-w-0 flex-1">
-              <span className="block text-[11px] text-secondary">Workspace</span>
-              <span className="block truncate font-bold">{current?.name}</span>
-            </span>
-            <ChevronDown className="size-4 text-muted" />
-          </button>
-        </MenuTrigger>
-        <MenuContent align="start">
-          <MenuLabel>Switch workspace</MenuLabel>
-          {workspaces.map((w) => (
-            <MenuItem key={w.id} onSelect={() => setCurrent(w.id)} icon={w.id === current?.id ? <span>•</span> : null}>
-              {w.name}
-            </MenuItem>
-          ))}
-          <MenuSeparator />
-          <MenuItem icon={<Plus className="size-4" />} onSelect={() => navigate('/workspace?new=1')}>
-            New workspace
-          </MenuItem>
-        </MenuContent>
-      </MenuRoot>
-
-      <ul className="flex flex-col gap-0.5" data-tour="nav">
-        {NAV.filter((n) => n.to !== "/settings").map((n) => (
-          <li key={n.to}>
-            <NavLink
-              to={n.to}
-              end={n.end}
-              className={({ isActive }) =>
-                cn(
-                  'flex h-8 items-center gap-2.5 rounded-[4px] px-2 text-ink hover:bg-hover',
-                  isActive && 'bg-selected font-bold',
-                )
-              }
-            >
-              <n.icon className="size-4 text-secondary" aria-hidden />
-              <span className="flex-1">{n.label}</span>
-              {n.to === '/inbox' && unread > 0 && <span className="num text-xs text-secondary">{unread}</span>}
-            </NavLink>
-          </li>
-        ))}
-      </ul>
-
-      {(bookmarks.data?.length ?? 0) > 0 && (
-        <div>
-          <h2 className="mb-1 flex items-center gap-1.5 px-2 font-sans text-xs font-bold text-secondary">
-            <BookMarked className="size-3.5" aria-hidden /> Bookmarks
-          </h2>
-          <ul className="flex flex-col gap-0.5">
-            {bookmarks.data!.map((b) => (
-              <li key={b.id} className="group flex items-center">
-                {b.kind === 'url' ? (
-                  <a href={b.url!} target="_blank" rel="noopener noreferrer" className="flex h-7 min-w-0 flex-1 items-center rounded-[4px] px-2 hover:bg-hover">
-                    <span className="truncate">{b.label || b.url}</span>
-                  </a>
-                ) : (
-                  <Link to={bookmarkHref(b)} className="flex h-7 min-w-0 flex-1 items-center rounded-[4px] px-2 hover:bg-hover">
-                    <span className="truncate">{b.label}</span>
-                  </Link>
-                )}
-                <button
-                  aria-label={`Remove bookmark ${b.label}`}
-                  className="invisible p-1 text-muted hover:text-ink group-hover:visible focus:visible"
-                  onClick={() => removeBookmark(b.id)}
-                >
-                  <X className="size-3.5" />
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      <div data-tour="projects">
-        <div className="mb-1 flex items-center justify-between px-2">
-          <h2 className="font-sans text-xs font-bold text-secondary">Projects</h2>
-          <Link to="/projects?new=1" className="text-muted hover:text-ink" aria-label="New project">
-            <Plus className="size-4" />
-          </Link>
-        </div>
-        <ul className="flex flex-col gap-0.5">
-          {wsProjects.map((p) => (
-            <li key={p.id}>
-              <NavLink
-                to={`/p/${p.id}`}
-                className={({ isActive }) => cn('flex h-7 items-center gap-2 rounded-[4px] px-2 hover:bg-hover', isActive && 'bg-selected')}
-              >
-                <span className={cn('size-2 shrink-0 rounded-[2px]', familyBar[p.color])} aria-hidden />
-                <span className="truncate">{p.acronym || p.name}</span>
-              </NavLink>
-            </li>
-          ))}
-          {wsProjects.length === 0 && !projects.isLoading && <li className="px-2 text-xs text-secondary">No projects yet</li>}
-        </ul>
-      </div>
-    </nav>
-  );
 }
 
 export function bookmarkHref(b: { kind: string; target_id: string | null; project_id: string | null }): string {

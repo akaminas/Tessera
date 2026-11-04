@@ -97,7 +97,7 @@ export default function ProjectLayout() {
   return (
     <div className="flex h-full min-h-0 flex-col">
       {!focus && (
-        <div className="no-print border-b border-grid bg-surface px-3 pt-3 sm:px-5">
+        <div className="project-bar no-print border-b border-grid bg-surface px-3 pt-3 sm:px-5">
           <div className="flex flex-wrap items-center gap-2">
             <span className={cn('size-3 rounded-[3px]', familyBar[p.color])} aria-hidden />
             <h1 className="min-w-0 truncate text-xl leading-tight sm:text-2xl">{p.name}</h1>

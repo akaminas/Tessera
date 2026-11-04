@@ -151,7 +151,8 @@ test.describe.serial('collaboration', () => {
     await page.goto(boardUrl);
     await expect(page.getByText('Alpha task')).toBeVisible();
     await page.getByRole('button', { name: 'Toggle navigation' }).click();
-    await expect(page.getByRole('complementary', { name: 'Main navigation' }).getByRole('link', { name: 'My Work' })).toBeVisible();
+    await expect(page.getByRole('menuitem', { name: 'My Work' })).toBeVisible();
+    await page.keyboard.press('Escape');
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBeLessThanOrEqual(1);
     await ctx.close();

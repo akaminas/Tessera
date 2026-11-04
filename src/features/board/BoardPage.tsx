@@ -49,6 +49,7 @@ import { NewBoardDialog } from './NewBoardDialog';
 import { usePersistentState } from '@/lib/usePersistentState';
 import { useWorkPackagesLite } from '@/data/lite';
 import { boardBackground } from '@/domain/backgrounds';
+import { useShellBackground } from '@/layout/shellBackground';
 
 export default function BoardPage() {
   const { boardId } = useParams();
@@ -319,6 +320,9 @@ export default function BoardPage() {
     if (!selectMode) setSelected(new Set());
   }, [selectMode]);
 
+  // A photo fills the whole window, behind the top bar and project header.
+  useShellBackground(board && boardBackground(board.background).onImage ? board.background : null);
+
   if (boards.isLoading || data.isLoading) return <PageLoading />;
   if (data.error) return <div className="p-6"><ErrorNote error={data.error} retry={() => data.refetch()} /></div>;
   if (!board) return <div className="p-6"><ErrorNote error={new Error('This board was deleted or you no longer have access.')} /></div>;
@@ -330,9 +334,9 @@ export default function BoardPage() {
   const selectedCards = [...selected].map((id) => cardById.get(id)).filter(Boolean) as CardWithRelations[];
 
   return (
-    <div className={cn('flex h-full min-h-0 flex-col', bg.onImage && 'on-image')} style={bg.style}>
+    <div className={cn('flex h-full min-h-0 flex-col', bg.onImage && 'on-image')} style={bg.onImage ? undefined : bg.style}>
       {/* On a photo or colour, the board bar is translucent with light text. */}
-      <div className={cn('board-bar no-print flex flex-wrap items-center gap-2 px-3 py-2 sm:px-5', bg.onImage ? 'bg-black/25 text-white backdrop-blur-[2px]' : 'border-b border-grid')}>
+      <div className={cn('board-bar no-print flex flex-wrap items-center gap-2 px-3 py-2 sm:px-5', bg.onImage ? 'bg-black/15 text-white' : 'border-b border-grid')}>
         <MenuRoot>
           <MenuTrigger asChild>
             <button className="flex items-center gap-1 rounded-[4px] px-1.5 py-1 hover:bg-hover" aria-label="Switch board">
