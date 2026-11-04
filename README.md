@@ -30,32 +30,6 @@ Tessera combines a simple board for everyday work with the planning, reporting a
   - Edge Functions for the calendar feed and email digests.
 - **Security:** the browser only ever holds the public key. Every permission, including the narrower access to financial data, is enforced inside the database.
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/DATABASE.md](docs/DATABASE.md) and [docs/DESIGN.md](docs/DESIGN.md).
-
-## Getting started
-1. Follow [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) to create the Supabase project, apply migrations and configure GitHub Pages.
-2. For local development:
-   ```bash
-   npm install
-   cp .env.example .env.local     # add your Supabase URL and anon key
-   npm run dev
-   ```
-3. Sign up, create a workspace, and start from a template or a blank project.
-
-## Tests
-
-| Command | What it covers |
-|---|---|
-| `npm test` | Unit tests for domain logic: ordering, filters, recurrence, finance engine, workbook parsing, timeline, iCalendar, exporters, automation descriptions. |
-| `npm run test:db` | Every migration applied to a real PostgreSQL server. Covers multi-user RLS isolation, invitations, roles, finance permissions, integrity triggers, notifications, recurrence, templates, imports, automation engine and webhooks. |
-| `npm run test:e2e` | Playwright browser tests against a deployed backend. See [tests/e2e/README.md](tests/e2e/README.md). |
-
-## Documentation
-- [Phase 0 audit and architecture decisions](docs/PHASE0_AUDIT.md)
-- [Feature checklist: complete, partial, not implemented](docs/FEATURES.md)
-- [Deployment and environment configuration](docs/DEPLOYMENT.md)
-- [Database, permissions, backup and restore](docs/DATABASE.md)
-- [Licences and third-party components](docs/LICENSES.md)
 
 ## Licence
 MIT. Third-party components keep their own licences; see [docs/LICENSES.md](docs/LICENSES.md).
