@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowUpRight, CornerDownRight, ExternalLink, FileText, GitBranch, Link2, Paperclip, Plus, Trash2, Upload, Eye, EyeOff, Clock } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
@@ -336,13 +336,17 @@ function AddItems({
 
 /* ================================================================ Subtasks */
 
-export function SubtasksSection({ card, canEdit, ctx }: { card: Card; canEdit: boolean; ctx: ProjectCtx }) {
+export function SubtasksSection({ card, canEdit, ctx, open }: { card: Card; canEdit: boolean; ctx: ProjectCtx; open?: boolean }) {
   const subs = useSubtasks(card.project_id, card.id);
   const [title, setTitle] = useState('');
   const [adding, setAdding] = useState(false);
   const toast = useToast();
   const list = subs.data ?? [];
-  if (!list.length && !canEdit) return null;
+  // Chosen from "Add to card": go straight to typing the first subtask.
+  useEffect(() => {
+    if (open) setAdding(true);
+  }, [open]);
+  if (!list.length && !(canEdit && (open || adding))) return null;
   const done = list.filter((s) => s.status === 'done').length;
   return (
     <section>
@@ -358,7 +362,7 @@ export function SubtasksSection({ card, canEdit, ctx }: { card: Card; canEdit: b
       >
         Subtasks {list.length > 0 && <span className="num font-normal text-secondary">{done}/{list.length}</span>}
       </SectionTitle>
-      {list.length === 0 && !adding && <p className="text-sm text-secondary">Split large work into smaller tasks that can be assigned and scheduled.</p>}
+      {list.length === 0 && !adding && <p className="text-sm text-secondary">Split this task into smaller ones.</p>}
       <ul className="flex flex-col divide-y divide-grid">
         {list.map((s) => (
           <li key={s.id} className="flex items-center gap-2 py-1 text-sm">
@@ -419,7 +423,7 @@ export function SubtasksSection({ card, canEdit, ctx }: { card: Card; canEdit: b
 
 /* ============================================================= Attachments */
 
-export function AttachmentsSection({ card, canEdit }: { card: Card; canEdit: boolean }) {
+export function AttachmentsSection({ card, canEdit, open }: { card: Card; canEdit: boolean; open?: boolean }) {
   const q = useAttachments(card.project_id, { cardId: card.id });
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
@@ -427,7 +431,7 @@ export function AttachmentsSection({ card, canEdit }: { card: Card; canEdit: boo
   const [name, setName] = useState('');
   const toast = useToast();
   const items = q.data ?? [];
-  if (!items.length && !canEdit) return null;
+  if (!items.length && !(canEdit && open)) return null;
   return (
     <section
       onDragOver={(e) => canEdit && e.preventDefault()}
@@ -614,7 +618,7 @@ function FieldInput({ type, value, disabled, label, onSave }: { type: string; va
 
 /* ====================================================== Dependencies & links */
 
-export function RelationsSection({ card, canEdit, ctx }: { card: Card; canEdit: boolean; ctx: ProjectCtx }) {
+export function RelationsSection({ card, canEdit, ctx, open }: { card: Card; canEdit: boolean; ctx: ProjectCtx; open?: boolean }) {
   const deps = useDependencies(card.project_id);
   const links = useCardLinks(card.project_id, card.id);
   const toast = useToast();
@@ -649,7 +653,7 @@ export function RelationsSection({ card, canEdit, ctx }: { card: Card; canEdit: 
   const blocks = (deps.data ?? []).filter((d) => d.predecessor_id === card.id);
   const linkRows = links.data?.links ?? [];
   const total = blockedBy.length + blocks.length + linkRows.length;
-  if (!total && !canEdit) return null;
+  if (!total && !(canEdit && open)) return null;
   const titles = titleQ.data ?? new Map();
   const openBlockers = blockedBy.filter((d) => titles.get(d.predecessor_id)?.status !== 'done').length;
 
@@ -742,13 +746,14 @@ function RelationRow({ verb, title, status, onOpen, onRemove }: { verb: string; 
 
 /* ==================================================================== Time */
 
-export function TimeSection({ card, canEdit }: { card: Card; canEdit: boolean }) {
+export function TimeSection({ card, canEdit, open }: { card: Card; canEdit: boolean; open?: boolean }) {
   const q = useCardTime(card.project_id, card.id);
   const { user } = useAuth();
   const toast = useToast();
   const [hours, setHours] = useState('');
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const total = (q.data ?? []).reduce((s, e) => s + (e.minutes ?? 0), 0);
+  if (!total && !card.estimate_minutes && !open) return null;
   return (
     <div className="flex flex-col gap-1">
       <span className="text-xs font-bold text-secondary">Time logged</span>

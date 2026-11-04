@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import * as RD from '@radix-ui/react-dialog';
 import {
@@ -21,6 +21,14 @@ import {
   X,
   LayoutTemplate,
   MapPin,
+  Paperclip,
+  GitBranch,
+  Flag,
+  CircleDot,
+  Clock,
+  Plus,
+  Layers,
+  Milestone,
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { useAuth } from '@/auth/AuthProvider';
@@ -33,7 +41,7 @@ import { startTimer } from '@/data/personal';
 import { addChecklist, useChecklists } from '@/data/cardExtras';
 import { useMilestonesLite, useWorkPackagesLite } from '@/data/lite';
 import type { Board, CardStatus, CardWithRelations, Label, List, Priority, Recurrence } from '@/data/types';
-import { Avatar, Button, ErrorNote, IconButton, Input, Select, Spinner, Tag, Textarea, STATUS_LABEL, PRIORITY_LABEL, StatusPill } from '@/components/ui';
+import { Avatar, Button, ErrorNote, IconButton, Input, Select, Spinner, Tag, Textarea, STATUS_LABEL, PRIORITY_LABEL } from '@/components/ui';
 import { MenuContent, MenuItem, MenuRoot, MenuSeparator, MenuTrigger, Popover } from '@/components/ui/Menu';
 import { ConfirmDialog, Dialog } from '@/components/ui/Dialog';
 import { Markdown } from '@/components/ui/Markdown';
@@ -101,11 +109,10 @@ export function CardDialog({ cardId, ctx, onClose }: { cardId: string; ctx: Proj
   const assigned = new Set((card?.card_assignees ?? []).map((a) => a.user_id));
   const cardLabels = new Set((card?.card_labels ?? []).map((l) => l.label_id));
 
-  const nextAction = useMemo(() => {
-    const items = checklists.data?.items ?? [];
-    const open = items.filter((i) => !i.done).sort((a, b) => (a.position < b.position ? -1 : 1));
-    return open[0]?.title ?? null;
-  }, [checklists.data]);
+  // Sections appear once they hold something, or when chosen from "Add to card".
+  const [shown, setShown] = useState<Set<string>>(() => new Set());
+  const reveal = (key: string) => setShown((s) => new Set(s).add(key));
+  const [picker, setPicker] = useState<'members' | 'labels' | null>(null);
 
   return (
     <RD.Root open onOpenChange={(o) => !o && onClose()}>
@@ -183,226 +190,253 @@ export function CardDialog({ cardId, ctx, onClose }: { cardId: string; ctx: Proj
               <div className="scroll-thin min-h-0 flex-1 overflow-y-auto">
                 <div className={cn('grid gap-6 px-4 py-4 sm:px-5', !wide && 'md:grid-cols-[1fr_240px]')}>
                   <div className="flex min-w-0 flex-col gap-6">
-                    {nextAction && card.status !== 'done' && (
-                      <p className="border-l-2 border-teal bg-card px-3 py-2 text-sm">
-                        <span className="text-secondary">Next step: </span>
-                        <b>{nextAction}</b>
-                      </p>
-                    )}
+                    {/* Trello's summary row: only what this task actually has. */}
+                    <div className="flex flex-wrap gap-x-6 gap-y-3 empty:hidden">
+                      {(assigned.size > 0 || shown.has('members')) && (
+                        <Prop label="Members">
+                          <div className="flex flex-wrap items-center gap-1">
+                            {[...assigned].map((id) => {
+                              const p = people.find((x) => x.user_id === id);
+                              return <Avatar key={id} name={p?.display_name ?? 'Former member'} color={p?.avatar_color ?? 'teal'} size={28} />;
+                            })}
+                            {canEdit && (
+                              <Popover
+                                open={picker === 'members'}
+                                onOpenChange={(o) => setPicker(o ? 'members' : null)}
+                                trigger={
+                                  <button className="grid size-7 place-items-center rounded-full bg-card text-secondary hover:bg-hover hover:text-ink" aria-label="Change members">
+                                    <Plus className="size-4" />
+                                  </button>
+                                }
+                              >
+                                <p className="mb-2 font-bold">Members</p>
+                                <ul className="flex max-h-64 flex-col gap-0.5 overflow-y-auto">
+                                  {people.map((p) => (
+                                    <li key={p.user_id}>
+                                      <label className="flex cursor-pointer items-center gap-2 rounded-[3px] px-1 py-1 hover:bg-hover">
+                                        <input
+                                          type="checkbox"
+                                          className="accent-[var(--v-teal-deep)]"
+                                          checked={assigned.has(p.user_id)}
+                                          onChange={(e) =>
+                                            setAssignee(card, p.user_id, e.target.checked)
+                                              .then(() => cardQ.refetch())
+                                              .catch(toast.error)
+                                          }
+                                        />
+                                        <Avatar name={p.display_name} color={p.avatar_color} size={20} />
+                                        <span className="truncate">{p.display_name}</span>
+                                        {p.user_id === me && <span className="text-xs text-secondary">(you)</span>}
+                                      </label>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </Popover>
+                            )}
+                          </div>
+                        </Prop>
+                      )}
+                      {(cardLabels.size > 0 || shown.has('labels')) && (
+                        <Prop label="Labels">
+                          <div className="flex flex-wrap items-center gap-1">
+                            {(metaQ.data?.labels ?? [])
+                              .filter((l) => cardLabels.has(l.id))
+                              .map((l) => (
+                                <Tag key={l.id} color={l.color} className="h-7 px-2.5 text-sm">
+                                  {l.name || l.color}
+                                </Tag>
+                              ))}
+                            {canEdit && (
+                              <Popover
+                                open={picker === 'labels'}
+                                onOpenChange={(o) => setPicker(o ? 'labels' : null)}
+                                trigger={
+                                  <button className="grid size-7 place-items-center rounded-[4px] bg-card text-secondary hover:bg-hover hover:text-ink" aria-label="Change labels">
+                                    <Plus className="size-4" />
+                                  </button>
+                                }
+                              >
+                                <p className="mb-2 font-bold">Labels</p>
+                                {(metaQ.data?.labels ?? []).length === 0 && <p className="text-secondary">This board has no labels yet. Add them from the board menu.</p>}
+                                <ul className="flex flex-col gap-1">
+                                  {(metaQ.data?.labels ?? []).map((l) => (
+                                    <li key={l.id}>
+                                      <label className="flex cursor-pointer items-center gap-2">
+                                        <input
+                                          type="checkbox"
+                                          className="accent-[var(--v-teal-deep)]"
+                                          checked={cardLabels.has(l.id)}
+                                          onChange={(e) =>
+                                            setCardLabel(card, l.id, e.target.checked)
+                                              .then(() => cardQ.refetch())
+                                              .catch(toast.error)
+                                          }
+                                        />
+                                        <Tag color={l.color}>{l.name || l.color}</Tag>
+                                      </label>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </Popover>
+                            )}
+                          </div>
+                        </Prop>
+                      )}
+                      {(card.due_date || card.start_date || shown.has('dates')) && <DatesProp card={card} canEdit={canEdit} onSave={save} autoOpen={shown.has('dates')} />}
+                      {(card.priority !== 'none' || shown.has('priority')) && (
+                        <Prop label="Priority">
+                          <Select value={card.priority} disabled={!canEdit} onChange={(e) => save({ priority: e.target.value as Priority }).catch(() => {})} className="h-8 w-32" aria-label="Priority">
+                            {(['none', 'low', 'medium', 'high', 'urgent'] as Priority[]).map((p) => (
+                              <option key={p} value={p}>
+                                {PRIORITY_LABEL[p]}
+                              </option>
+                            ))}
+                          </Select>
+                        </Prop>
+                      )}
+                      {(card.status === 'in_progress' || card.status === 'blocked' || shown.has('status')) && (
+                        <Prop label="Status">
+                          <Select value={card.status} disabled={!canEdit} onChange={(e) => save({ status: e.target.value as CardStatus }).catch(() => {})} className="h-8 w-36" aria-label="Status">
+                            {(Object.keys(STATUS_LABEL) as CardStatus[]).map((s) => (
+                              <option key={s} value={s}>
+                                {STATUS_LABEL[s]}
+                              </option>
+                            ))}
+                          </Select>
+                        </Prop>
+                      )}
+                      {(card.recurrence || shown.has('repeat')) && <RecurrenceProp card={card} canEdit={canEdit} onSave={save} autoOpen={shown.has('repeat')} />}
+                      {(card.lat != null || shown.has('location')) && <LocationProp card={card} canEdit={canEdit} onSave={save} autoOpen={shown.has('location')} />}
+                      {ctx.has('workpackages') && (card.work_package_id || shown.has('wp')) && (
+                        <Prop label="Work package">
+                          <Select value={card.work_package_id ?? ''} disabled={!canEdit} onChange={(e) => save({ work_package_id: e.target.value || null }).catch(() => {})} className="h-8 max-w-56" aria-label="Work package">
+                            <option value="">None</option>
+                            {(wps.data ?? []).map((w) => (
+                              <option key={w.id} value={w.id}>
+                                {w.code} {w.name}
+                              </option>
+                            ))}
+                          </Select>
+                        </Prop>
+                      )}
+                      {ctx.has('milestones') && (card.milestone_id || shown.has('milestone')) && (
+                        <Prop label="Milestone">
+                          <Select value={card.milestone_id ?? ''} disabled={!canEdit} onChange={(e) => save({ milestone_id: e.target.value || null }).catch(() => {})} className="h-8 max-w-56" aria-label="Milestone">
+                            <option value="">None</option>
+                            {(milestones.data ?? []).map((m) => (
+                              <option key={m.id} value={m.id}>
+                                {m.code} {m.title}
+                              </option>
+                            ))}
+                          </Select>
+                        </Prop>
+                      )}
+                      {(card.estimate_minutes || shown.has('time')) && (
+                        <Prop label="Estimate">
+                          <EstimateInput value={card.estimate_minutes} disabled={!canEdit} autoFocus={shown.has('time') && !card.estimate_minutes} onSave={(estimate_minutes) => save({ estimate_minutes }).catch(() => {})} />
+                        </Prop>
+                      )}
+                      {card.responsible_text && (
+                        <Prop label="Responsible (imported)">
+                          <span className="text-sm">{card.responsible_text}</span>
+                        </Prop>
+                      )}
+                    </div>
                     <DescriptionEditor card={card} canEdit={canEdit} onSave={(description) => save({ description })} />
                     <FieldsSection card={card} canEdit={canEdit} />
                     <ChecklistsSection card={card} canEdit={canEdit} people={people} data={checklists.data} />
-                    <SubtasksSection card={card} canEdit={canEdit} ctx={ctx} />
-                    <AttachmentsSection card={card} canEdit={canEdit} />
-                    <RelationsSection card={card} canEdit={canEdit} ctx={ctx} />
+                    <SubtasksSection card={card} canEdit={canEdit} ctx={ctx} open={shown.has('subtasks')} />
+                    <AttachmentsSection card={card} canEdit={canEdit} open={shown.has('attachments')} />
+                    <RelationsSection card={card} canEdit={canEdit} ctx={ctx} open={shown.has('relations')} />
                     {!wide && <CommentsAndActivity card={card} ctx={ctx} />}
                   </div>
 
-                  <aside className="flex flex-col gap-4 text-sm" aria-label="Task details">
-                    <Prop label="Status">
-                      <Select
-                        value={card.status}
-                        disabled={!canEdit}
-                        onChange={(e) => save({ status: e.target.value as CardStatus }).catch(() => {})}
-                        className="h-8"
-                        aria-label="Status"
-                      >
-                        {(Object.keys(STATUS_LABEL) as CardStatus[]).map((s) => (
-                          <option key={s} value={s}>
-                            {STATUS_LABEL[s]}
-                          </option>
-                        ))}
-                      </Select>
-                    </Prop>
-                    <Prop label="Priority">
-                      <Select
-                        value={card.priority}
-                        disabled={!canEdit}
-                        onChange={(e) => save({ priority: e.target.value as Priority }).catch(() => {})}
-                        className="h-8"
-                        aria-label="Priority"
-                      >
-                        {(['none', 'low', 'medium', 'high', 'urgent'] as Priority[]).map((p) => (
-                          <option key={p} value={p}>
-                            {PRIORITY_LABEL[p]}
-                          </option>
-                        ))}
-                      </Select>
-                    </Prop>
-                    <Prop label="Assignees">
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        {[...assigned].map((id) => {
-                          const p = people.find((x) => x.user_id === id);
-                          return (
-                            <span key={id} className="inline-flex items-center gap-1 rounded-[3px] bg-card py-0.5 pl-0.5 pr-1.5 text-xs">
-                              <Avatar name={p?.display_name ?? 'Former member'} color={p?.avatar_color ?? 'teal'} size={20} />
-                              {p?.display_name ?? 'Former member'}
-                            </span>
-                          );
-                        })}
-                        {canEdit && (
-                          <Popover
-                            trigger={
-                              <Button size="sm" variant="ghost" icon={<UserPlus className="size-3.5" />}>
-                                {assigned.size ? 'Change' : 'Assign'}
-                              </Button>
-                            }
-                          >
-                            <ul className="flex max-h-64 flex-col gap-0.5 overflow-y-auto">
-                              {people.map((p) => (
-                                <li key={p.user_id}>
-                                  <label className="flex cursor-pointer items-center gap-2 rounded-[3px] px-1 py-1 hover:bg-hover">
-                                    <input
-                                      type="checkbox"
-                                      className="accent-[var(--v-teal-deep)]"
-                                      checked={assigned.has(p.user_id)}
-                                      onChange={(e) =>
-                                        setAssignee(card, p.user_id, e.target.checked)
-                                          .then(() => cardQ.refetch())
-                                          .catch(toast.error)
-                                      }
-                                    />
-                                    <Avatar name={p.display_name} color={p.avatar_color} size={20} />
-                                    <span className="truncate">{p.display_name}</span>
-                                    {p.user_id === me && <span className="text-xs text-secondary">(you)</span>}
-                                  </label>
-                                </li>
-                              ))}
-                            </ul>
-                          </Popover>
-                        )}
-                      </div>
-                    </Prop>
-                    <Prop label="Labels">
-                      <div className="flex flex-wrap items-center gap-1">
-                        {(metaQ.data?.labels ?? [])
-                          .filter((l) => cardLabels.has(l.id))
-                          .map((l) => (
-                            <Tag key={l.id} color={l.color}>
-                              {l.name || l.color}
-                            </Tag>
-                          ))}
-                        {canEdit && (
-                          <Popover
-                            trigger={
-                              <Button size="sm" variant="ghost" icon={<Tags className="size-3.5" />}>
-                                Edit
-                              </Button>
-                            }
-                          >
-                            {(metaQ.data?.labels ?? []).length === 0 && <p className="text-secondary">No labels on this board yet. Add them from the board menu.</p>}
-                            <ul className="flex flex-col gap-1">
-                              {(metaQ.data?.labels ?? []).map((l) => (
-                                <li key={l.id}>
-                                  <label className="flex cursor-pointer items-center gap-2">
-                                    <input
-                                      type="checkbox"
-                                      className="accent-[var(--v-teal-deep)]"
-                                      checked={cardLabels.has(l.id)}
-                                      onChange={(e) =>
-                                        setCardLabel(card, l.id, e.target.checked)
-                                          .then(() => cardQ.refetch())
-                                          .catch(toast.error)
-                                      }
-                                    />
-                                    <Tag color={l.color}>{l.name || l.color}</Tag>
-                                  </label>
-                                </li>
-                              ))}
-                            </ul>
-                          </Popover>
-                        )}
-                      </div>
-                    </Prop>
-                    <DatesProp card={card} canEdit={canEdit} onSave={save} />
-                    <RecurrenceProp card={card} canEdit={canEdit} onSave={save} />
-                    {ctx.has('workpackages') && (
-                      <Prop label="Work package">
-                        <Select
-                          value={card.work_package_id ?? ''}
-                          disabled={!canEdit}
-                          onChange={(e) => save({ work_package_id: e.target.value || null }).catch(() => {})}
-                          className="h-8"
-                          aria-label="Work package"
-                        >
-                          <option value="">None</option>
-                          {(wps.data ?? []).map((w) => (
-                            <option key={w.id} value={w.id}>
-                              {w.code} {w.name}
-                            </option>
-                          ))}
-                        </Select>
-                      </Prop>
-                    )}
-                    {ctx.has('milestones') && (
-                      <Prop label="Contributes to milestone">
-                        <Select
-                          value={card.milestone_id ?? ''}
-                          disabled={!canEdit}
-                          onChange={(e) => save({ milestone_id: e.target.value || null }).catch(() => {})}
-                          className="h-8"
-                          aria-label="Milestone"
-                        >
-                          <option value="">None</option>
-                          {(milestones.data ?? []).map((m) => (
-                            <option key={m.id} value={m.id}>
-                              {m.code} {m.title}
-                            </option>
-                          ))}
-                        </Select>
-                      </Prop>
-                    )}
-                    <LocationProp card={card} canEdit={canEdit} onSave={save} />
-                    <Prop label="Estimate">
-                      <EstimateInput value={card.estimate_minutes} disabled={!canEdit} onSave={(estimate_minutes) => save({ estimate_minutes }).catch(() => {})} />
-                    </Prop>
-                    <TimeSection card={card} canEdit={canEdit} />
-                    {card.responsible_text && (
-                      <Prop label="Responsible (imported)">
-                        <span>{card.responsible_text}</span>
-                      </Prop>
-                    )}
-                    {ctx.has('automations') && <CardButtons projectId={card.project_id} boardId={card.board_id} cardId={card.id} canEdit={canEdit} />}
-                    <div className="flex flex-col gap-1.5 border-t border-grid pt-3">
-                      {canEdit && (
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          icon={<ListChecks className="size-3.5" />}
+                  <aside className="flex flex-col gap-5 text-sm" aria-label="Task details">
+                    {canEdit && (
+                      <SideGroup title="Add to card">
+                        <SideButton icon={<UserPlus className="size-4" />} onClick={() => (reveal('members'), setPicker('members'))}>
+                          Members
+                        </SideButton>
+                        <SideButton icon={<Tags className="size-4" />} onClick={() => (reveal('labels'), setPicker('labels'))}>
+                          Labels
+                        </SideButton>
+                        <SideButton
+                          icon={<ListChecks className="size-4" />}
                           onClick={() =>
                             addChecklist(card, 'Checklist', keyAfterLast(checklists.data?.checklists ?? []))
                               .then(() => checklists.refetch())
                               .catch(toast.error)
                           }
                         >
-                          Add checklist
-                        </Button>
-                      )}
-                      {canEdit && (
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          icon={<Play className="size-3.5" />}
-                          onClick={() => startTimer(card.project_id, card.id).then(() => toast.show('Timer started')).catch(toast.error)}
-                        >
-                          Start timer
-                        </Button>
-                      )}
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        icon={watching ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                          Checklist
+                        </SideButton>
+                        <SideButton icon={<CalendarDays className="size-4" />} onClick={() => reveal('dates')}>
+                          Dates
+                        </SideButton>
+                        <SideButton icon={<Paperclip className="size-4" />} onClick={() => reveal('attachments')}>
+                          Attachment
+                        </SideButton>
+                        <MenuRoot>
+                          <MenuTrigger asChild>
+                            <SideButton icon={<MoreHorizontal className="size-4" />}>More</SideButton>
+                          </MenuTrigger>
+                          <MenuContent align="start">
+                            <MenuItem icon={<GitBranch className="size-4" />} onSelect={() => reveal('subtasks')}>
+                              Subtasks
+                            </MenuItem>
+                            <MenuItem icon={<Flag className="size-4" />} onSelect={() => reveal('priority')}>
+                              Priority
+                            </MenuItem>
+                            <MenuItem icon={<CircleDot className="size-4" />} onSelect={() => reveal('status')}>
+                              Status (in progress, blocked)
+                            </MenuItem>
+                            <MenuItem icon={<Repeat className="size-4" />} onSelect={() => reveal('repeat')}>
+                              Repeat
+                            </MenuItem>
+                            <MenuItem icon={<Link2 className="size-4" />} onSelect={() => reveal('relations')}>
+                              Dependencies and links
+                            </MenuItem>
+                            <MenuItem icon={<Clock className="size-4" />} onSelect={() => reveal('time')}>
+                              Estimate and time
+                            </MenuItem>
+                            {ctx.has('map') && (
+                              <MenuItem icon={<MapPin className="size-4" />} onSelect={() => reveal('location')}>
+                                Location
+                              </MenuItem>
+                            )}
+                            {ctx.has('workpackages') && (
+                              <MenuItem icon={<Layers className="size-4" />} onSelect={() => reveal('wp')}>
+                                Work package
+                              </MenuItem>
+                            )}
+                            {ctx.has('milestones') && (
+                              <MenuItem icon={<Milestone className="size-4" />} onSelect={() => reveal('milestone')}>
+                                Milestone
+                              </MenuItem>
+                            )}
+                          </MenuContent>
+                        </MenuRoot>
+                      </SideGroup>
+                    )}
+                    <SideGroup title="Actions">
+                      <SideButton
+                        icon={watching ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                         onClick={() => setWatching(card, me, !watching).then(() => cardQ.refetch()).catch(toast.error)}
                         aria-pressed={watching}
                       >
                         {watching ? 'Stop watching' : 'Watch'}
-                      </Button>
-                    </div>
+                      </SideButton>
+                      {canEdit && (
+                        <SideButton icon={<Play className="size-4" />} onClick={() => startTimer(card.project_id, card.id).then(() => (reveal('time'), toast.show('Timer started'))).catch(toast.error)}>
+                          Start timer
+                        </SideButton>
+                      )}
+                      {ctx.has('automations') && <CardButtons projectId={card.project_id} boardId={card.board_id} cardId={card.id} canEdit={canEdit} />}
+                    </SideGroup>
+                    <TimeSection card={card} canEdit={canEdit} open={shown.has('time')} />
                     <p className="text-xs text-secondary">
                       Created {format(parseISO(card.created_at), 'd MMM yyyy')}
                       {card.completed_at && <> · completed {format(parseISO(card.completed_at), 'd MMM yyyy')}</>}
-                      <br />
-                      <StatusPill status={card.status} />
                     </p>
                   </aside>
                 </div>
@@ -428,6 +462,33 @@ function Prop({ label, children }: { label: string; children: React.ReactNode })
     </div>
   );
 }
+
+function SideGroup({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="flex flex-col gap-1.5">
+      <h3 className="font-sans text-xs font-bold text-secondary">{title}</h3>
+      {children}
+    </section>
+  );
+}
+
+/** A full-width, quiet button in the card sidebar, as on the back of a Trello card. */
+const SideButton = forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement> & { icon: React.ReactNode }>(function SideButton(
+  { icon, children, className, ...rest },
+  ref,
+) {
+  return (
+    <button
+      ref={ref}
+      type="button"
+      {...rest}
+      className={cn('flex h-8 w-full items-center gap-2 rounded-[4px] bg-card px-2.5 text-left text-sm text-ink hover:bg-hover focus-visible:ring-2 focus-visible:ring-teal', className)}
+    >
+      <span className="text-secondary">{icon}</span>
+      {children}
+    </button>
+  );
+});
 
 function TitleEditor({ title, canEdit, onSave }: { title: string; canEdit: boolean; onSave: (t: string) => Promise<void> }) {
   const [draft, setDraft] = useState(title);
@@ -533,7 +594,8 @@ function DescriptionEditor({ card, canEdit, onSave }: { card: CardWithRelations;
   );
 }
 
-function DatesProp({ card, canEdit, onSave }: { card: CardWithRelations; canEdit: boolean; onSave: (p: Partial<CardWithRelations>) => Promise<void> }) {
+function DatesProp({ card, canEdit, onSave, autoOpen }: { card: CardWithRelations; canEdit: boolean; onSave: (p: Partial<CardWithRelations>) => Promise<void>; autoOpen?: boolean }) {
+  const [open, setOpen] = useState(Boolean(autoOpen));
   const [start, setStart] = useState(card.start_date ?? '');
   const [due, setDue] = useState(card.due_date ?? '');
   const [time, setTime] = useState(card.due_time?.slice(0, 5) ?? '');
@@ -552,6 +614,8 @@ function DatesProp({ card, canEdit, onSave }: { card: CardWithRelations; canEdit
     <Prop label="Dates">
       {canEdit ? (
         <Popover
+          open={open}
+          onOpenChange={setOpen}
           trigger={
             <Button size="sm" variant="ghost" className="justify-start" icon={<CalendarDays className="size-3.5" />}>
               {label}
@@ -564,7 +628,7 @@ function DatesProp({ card, canEdit, onSave }: { card: CardWithRelations; canEdit
               e.preventDefault();
               if (start && due && due < start) return setErr('The due date must be on or after the start date.');
               setErr(null);
-              onSave({ start_date: start || null, due_date: due || null, due_time: due && time ? time : null }).catch(() => {});
+              onSave({ start_date: start || null, due_date: due || null, due_time: due && time ? time : null }).then(() => setOpen(false)).catch(() => {});
             }}
           >
             <label className="text-xs font-bold">
@@ -597,7 +661,8 @@ function DatesProp({ card, canEdit, onSave }: { card: CardWithRelations; canEdit
   );
 }
 
-function RecurrenceProp({ card, canEdit, onSave }: { card: CardWithRelations; canEdit: boolean; onSave: (p: Partial<CardWithRelations>) => Promise<void> }) {
+function RecurrenceProp({ card, canEdit, onSave, autoOpen }: { card: CardWithRelations; canEdit: boolean; onSave: (p: Partial<CardWithRelations>) => Promise<void>; autoOpen?: boolean }) {
+  const [open, setOpen] = useState(Boolean(autoOpen));
   const r = card.recurrence;
   const [freq, setFreq] = useState<Recurrence['freq']>(r?.freq ?? 'weekly');
   const [interval, setInterval] = useState(String(r?.interval ?? 1));
@@ -608,6 +673,8 @@ function RecurrenceProp({ card, canEdit, onSave }: { card: CardWithRelations; ca
     <Prop label="Repeat">
       {canEdit ? (
         <Popover
+          open={open}
+          onOpenChange={setOpen}
           trigger={
             <Button size="sm" variant="ghost" className="justify-start" icon={<Repeat className="size-3.5" />}>
               {r ? describeRecurrence(r) : 'Does not repeat'}
@@ -673,7 +740,8 @@ function RecurrenceProp({ card, canEdit, onSave }: { card: CardWithRelations; ca
   );
 }
 
-function LocationProp({ card, canEdit, onSave }: { card: CardWithRelations; canEdit: boolean; onSave: (p: Partial<CardWithRelations>) => Promise<void> }) {
+function LocationProp({ card, canEdit, onSave, autoOpen }: { card: CardWithRelations; canEdit: boolean; onSave: (p: Partial<CardWithRelations>) => Promise<void>; autoOpen?: boolean }) {
+  const [open, setOpen] = useState(Boolean(autoOpen));
   const [label, setLabel] = useState(card.location_label ?? '');
   const [coords, setCoords] = useState(card.lat != null ? `${card.lat}, ${card.lng}` : '');
   const [err, setErr] = useState<string | null>(null);
@@ -682,6 +750,8 @@ function LocationProp({ card, canEdit, onSave }: { card: CardWithRelations; canE
     <Prop label="Location">
       {canEdit ? (
         <Popover
+          open={open}
+          onOpenChange={setOpen}
           trigger={
             <Button size="sm" variant="ghost" className="justify-start" icon={<MapPin className="size-3.5" />}>
               {card.lat != null ? card.location_label || `${card.lat.toFixed(3)}, ${card.lng!.toFixed(3)}` : 'Add location'}
@@ -701,7 +771,7 @@ function LocationProp({ card, canEdit, onSave }: { card: CardWithRelations; canE
               const lng = m ? parseFloat(m[2]) : NaN;
               if (!m || Math.abs(lat) > 90 || Math.abs(lng) > 180) return setErr('Enter latitude, longitude, e.g. 37.9838, 23.7275');
               setErr(null);
-              onSave({ lat, lng, location_label: label.trim() || null }).catch(() => {});
+              onSave({ lat, lng, location_label: label.trim() || null }).then(() => setOpen(false)).catch(() => {});
             }}
           >
             <label className="text-xs font-bold">
@@ -726,7 +796,7 @@ function LocationProp({ card, canEdit, onSave }: { card: CardWithRelations; canE
   );
 }
 
-function EstimateInput({ value, disabled, onSave }: { value: number | null; disabled: boolean; onSave: (v: number | null) => void }) {
+function EstimateInput({ value, disabled, onSave, autoFocus }: { value: number | null; disabled: boolean; onSave: (v: number | null) => void; autoFocus?: boolean }) {
   const [v, setV] = useState(value != null ? String(+(value / 60).toFixed(2)) : '');
   useEffect(() => setV(value != null ? String(+(value / 60).toFixed(2)) : ''), [value]);
   return (
@@ -743,6 +813,7 @@ function EstimateInput({ value, disabled, onSave }: { value: number | null; disa
           const minutes = Number.isFinite(h) && h > 0 ? Math.round(h * 60) : null;
           if (minutes !== value) onSave(minutes);
         }}
+        autoFocus={autoFocus}
         className="h-8 w-20"
         aria-label="Estimate in hours"
       />

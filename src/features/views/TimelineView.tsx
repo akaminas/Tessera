@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { format, parseISO } from 'date-fns';
 import { AlertCircle, ChevronDown, ChevronRight, CornerDownRight, Diamond } from 'lucide-react';
@@ -68,7 +68,6 @@ export default function TimelineView() {
   const [planEdit, setPlanEdit] = useState(false);
   const [showDeps, setShowDeps] = usePersistentState(`tl-deps:${project.id}`, true);
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
-  const textRef = useRef<HTMLInputElement>(null);
   const today = format(new Date(), 'yyyy-MM-dd');
   const nameW = 240;
 
@@ -232,7 +231,7 @@ export default function TimelineView() {
         <Checkbox checked={showDeps} onChange={setShowDeps} label="Dependencies" />
         {mode === 'months' && canEdit && <Checkbox checked={planEdit} onChange={setPlanEdit} label="Plan by month" />}
         <div className="ml-auto">
-          <FilterBar filter={filter} onChange={setFilter} people={people} labels={structQ.data?.labels} workPackages={wps.data} view="timeline" projectId={project.id} textRef={textRef} />
+          <FilterBar filter={filter} onChange={setFilter} people={people} labels={structQ.data?.labels} workPackages={wps.data} view="timeline" projectId={project.id} />
         </div>
       </div>
       {mode === 'months' && (

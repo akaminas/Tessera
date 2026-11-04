@@ -65,13 +65,14 @@ export default function ProjectLayout() {
   const cardId = params.get('card');
 
   const tabs: { to: string; label: string; module?: ProjectModule; end?: boolean }[] = [
-    { to: '', label: 'Overview', end: true },
+    // Views of the same tasks first (as Trello's view switcher), then the project's own pages.
     ...(firstBoard ? [{ to: `board/${firstBoard.id}`, label: 'Board', module: 'board' as const }] : []),
     { to: 'table', label: 'Table', module: 'table' },
     { to: 'timeline', label: 'Timeline', module: 'timeline' },
     { to: 'calendar', label: 'Calendar', module: 'calendar' },
     { to: 'dashboard', label: 'Dashboard', module: 'dashboard' },
     { to: 'map', label: 'Map', module: 'map' },
+    { to: 'overview', label: 'Overview' },
     { to: 'workpackages', label: 'Work packages', module: 'workpackages' },
     { to: 'milestones', label: 'Milestones', module: 'milestones' },
     { to: 'budget', label: 'Budget', module: 'budget' },
@@ -101,7 +102,7 @@ export default function ProjectLayout() {
             <span className={cn('size-3 rounded-[3px]', familyBar[p.color])} aria-hidden />
             <h1 className="min-w-0 truncate text-xl leading-tight sm:text-2xl">{p.name}</h1>
             {p.acronym && <span className="text-sm text-secondary">{p.acronym}</span>}
-            <span className="text-xs text-secondary">· {STATUS_LABEL[p.status]}</span>
+            {p.status !== 'active' && <span className="text-xs text-secondary">· {STATUS_LABEL[p.status]}</span>}
             {p.personal_owner && <span className="text-xs text-secondary">· Private to you</span>}
             <IconButton
               label={starred ? 'Remove bookmark' : 'Bookmark project'}

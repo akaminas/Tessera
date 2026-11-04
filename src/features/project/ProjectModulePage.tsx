@@ -31,7 +31,7 @@ export default function ProjectModulePage() {
   if (!entry)
     return (
       <div className="p-6 text-sm">
-        Unknown page. <Link className="text-link underline" to={`/p/${ctx.project.id}`}>Back to the project overview</Link>
+        Unknown page. <Link className="text-link underline" to={`/p/${ctx.project.id}`}>Back to the project</Link>
       </div>
     );
   if (entry.module && !ctx.has(entry.module)) {

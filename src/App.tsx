@@ -25,6 +25,7 @@ const InvitePage = lazy(() => import('./pages/InvitePage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
 const ProjectLayout = lazy(() => import('./features/project/ProjectLayout'));
 const ProjectOverview = lazy(() => import('./features/project/ProjectOverview'));
+const ProjectIndex = lazy(() => import('./features/project/ProjectIndex'));
 const BoardPage = lazy(() => import('./features/board/BoardPage'));
 const ProjectModulePage = lazy(() => import('./features/project/ProjectModulePage'));
 const CardRedirect = lazy(() => import('./pages/CardRedirect'));
@@ -80,7 +81,8 @@ const router = createBrowserRouter(
               path: 'p/:projectId',
               element: <ProjectLayout />,
               children: [
-                { index: true, element: <ProjectOverview /> },
+                { index: true, element: <ProjectIndex /> },
+                { path: 'overview', element: <ProjectOverview /> },
                 { path: 'board/:boardId', element: <BoardPage /> },
                 { path: ':module', element: <ProjectModulePage /> },
                 { path: ':module/:sub', element: <ProjectModulePage /> },

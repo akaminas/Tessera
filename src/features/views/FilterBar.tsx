@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Bookmark, Filter, Save, Search, Trash2, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Filter, Save, Search, Trash2, X } from 'lucide-react';
 import { Button, Checkbox, Input, Select, Tag } from '@/components/ui';
 import { Popover } from '@/components/ui/Menu';
 import { useToast } from '@/components/ui/Toast';
@@ -23,6 +23,10 @@ function toggle<T>(arr: T[] | undefined, v: T): T[] {
   return a.includes(v) ? a.filter((x) => x !== v) : [...a, v];
 }
 
+/**
+ * One "Filter" button, as on a Trello board. Keyword, people, labels, dates and
+ * saved filters all live in its popover; the button shows how many are active.
+ */
 export function FilterBar({
   filter,
   onChange,
@@ -32,7 +36,7 @@ export function FilterBar({
   view,
   projectId,
   extra,
-  textRef,
+  openRef,
 }: {
   filter: CardFilter;
   onChange: (f: CardFilter) => void;
@@ -42,11 +46,13 @@ export function FilterBar({
   view: string;
   projectId?: string;
   extra?: React.ReactNode;
-  textRef?: React.RefObject<HTMLInputElement | null>;
+  /** Receives a function that opens the filter (used by the `f` shortcut). */
+  openRef?: React.MutableRefObject<(() => void) | null>;
 }) {
   const [open, setOpen] = useState(false);
   const active = isFilterActive(filter);
   const count =
+    (filter.text?.trim() ? 1 : 0) +
     (filter.assignees?.length ?? 0) +
     (filter.labels?.length ?? 0) +
     (filter.status?.length ?? 0) +
@@ -55,61 +61,64 @@ export function FilterBar({
     (filter.due && filter.due !== 'any' ? 1 : 0) +
     (filter.showDone === false ? 1 : 0);
 
+  useEffect(() => {
+    if (!openRef) return;
+    openRef.current = () => setOpen(true);
+    return () => {
+      openRef.current = null;
+    };
+  }, [openRef]);
+
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <div className="relative w-48 sm:w-60">
-        <Search className="pointer-events-none absolute left-2 top-1/2 size-4 -translate-y-1/2 text-muted" aria-hidden />
-        <Input
-          ref={textRef}
-          value={filter.text ?? ''}
-          onChange={(e) => onChange({ ...filter, text: e.target.value })}
-          placeholder="Filter tasks"
-          aria-label="Filter tasks by text"
-          className="h-8 pl-7 text-sm"
-        />
-      </div>
-      <Button
-        size="sm"
-        variant={filter.assignees?.includes('me') ? 'primary' : 'secondary'}
-        onClick={() => onChange({ ...filter, assignees: toggle(filter.assignees, 'me') })}
-        aria-pressed={filter.assignees?.includes('me')}
-      >
-        My tasks
-      </Button>
+    <div className="flex items-center gap-1">
       <Popover
         open={open}
         onOpenChange={setOpen}
-        className="w-[min(92vw,420px)]"
+        className="w-[min(92vw,380px)]"
         trigger={
-          <Button size="sm" icon={<Filter className="size-3.5" />} aria-label="More filters">
-            Filters{count > 0 && <span className="num"> · {count}</span>}
+          <Button size="sm" variant={active ? 'secondary' : 'ghost'} icon={<Filter className="size-3.5" />} aria-label="Filter tasks">
+            Filter{count > 0 && <span className="num"> · {count}</span>}
           </Button>
         }
       >
-        <div className="flex flex-col gap-3 text-sm">
+        <div className="flex max-h-[70vh] flex-col gap-3 overflow-y-auto text-sm">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-2 top-1/2 size-4 -translate-y-1/2 text-muted" aria-hidden />
+            <Input
+              autoFocus
+              value={filter.text ?? ''}
+              onChange={(e) => onChange({ ...filter, text: e.target.value })}
+              placeholder="Keyword"
+              aria-label="Filter tasks by text"
+              className="h-8 pl-7 text-sm"
+            />
+          </div>
+          <fieldset className="flex flex-col gap-1">
+            <legend className="mb-1 font-bold">Members</legend>
+            <Checkbox checked={filter.assignees?.includes('me') ?? false} onChange={() => onChange({ ...filter, assignees: toggle(filter.assignees, 'me') })} label="Assigned to me" />
+            <Checkbox checked={filter.assignees?.includes('none') ?? false} onChange={() => onChange({ ...filter, assignees: toggle(filter.assignees, 'none') })} label="No members" />
+            {people.length > 1 && (
+              <div className="flex max-h-28 flex-col gap-1 overflow-y-auto">
+                {people.map((p) => (
+                  <Checkbox
+                    key={p.user_id}
+                    checked={filter.assignees?.includes(p.user_id) ?? false}
+                    onChange={() => onChange({ ...filter, assignees: toggle(filter.assignees, p.user_id) })}
+                    label={p.display_name}
+                  />
+                ))}
+              </div>
+            )}
+          </fieldset>
           <fieldset>
-            <legend className="mb-1 font-bold">Due</legend>
-            <Select value={filter.due ?? 'any'} onChange={(e) => onChange({ ...filter, due: e.target.value as DueFilter })} className="h-8">
+            <legend className="mb-1 font-bold">Due date</legend>
+            <Select value={filter.due ?? 'any'} onChange={(e) => onChange({ ...filter, due: e.target.value as DueFilter })} className="h-8" aria-label="Due date">
               {DUE_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>
                   {o.label}
                 </option>
               ))}
             </Select>
-          </fieldset>
-          <fieldset>
-            <legend className="mb-1 font-bold">Assigned to</legend>
-            <div className="flex max-h-32 flex-col gap-1 overflow-y-auto">
-              <Checkbox checked={filter.assignees?.includes('none') ?? false} onChange={() => onChange({ ...filter, assignees: toggle(filter.assignees, 'none') })} label="Nobody" />
-              {people.map((p) => (
-                <Checkbox
-                  key={p.user_id}
-                  checked={filter.assignees?.includes(p.user_id) ?? false}
-                  onChange={() => onChange({ ...filter, assignees: toggle(filter.assignees, p.user_id) })}
-                  label={p.display_name}
-                />
-              ))}
-            </div>
           </fieldset>
           {labels && labels.length > 0 && (
             <fieldset>
@@ -129,113 +138,117 @@ export function FilterBar({
               </div>
             </fieldset>
           )}
-          <div className="grid grid-cols-2 gap-3">
-            <fieldset>
-              <legend className="mb-1 font-bold">Status</legend>
-              {(Object.keys(STATUS_LABEL) as CardStatus[]).map((s) => (
-                <Checkbox key={s} checked={filter.status?.includes(s) ?? false} onChange={() => onChange({ ...filter, status: toggle(filter.status, s) })} label={STATUS_LABEL[s]} />
-              ))}
-            </fieldset>
-            <fieldset>
-              <legend className="mb-1 font-bold">Priority</legend>
-              {(['urgent', 'high', 'medium', 'low', 'none'] as Priority[]).map((s) => (
-                <Checkbox key={s} checked={filter.priority?.includes(s) ?? false} onChange={() => onChange({ ...filter, priority: toggle(filter.priority, s) })} label={PRIORITY_LABEL[s]} />
-              ))}
-            </fieldset>
-          </div>
-          {workPackages && workPackages.length > 0 && (
-            <fieldset>
-              <legend className="mb-1 font-bold">Work package</legend>
-              <div className="flex max-h-28 flex-col gap-1 overflow-y-auto">
-                {workPackages.map((w) => (
-                  <Checkbox
-                    key={w.id}
-                    checked={filter.workPackages?.includes(w.id) ?? false}
-                    onChange={() => onChange({ ...filter, workPackages: toggle(filter.workPackages, w.id) })}
-                    label={`${w.code} ${w.name}`}
-                  />
-                ))}
-                <Checkbox checked={filter.workPackages?.includes('none') ?? false} onChange={() => onChange({ ...filter, workPackages: toggle(filter.workPackages, 'none') })} label="Not in a work package" />
+          <details className="group" open={(filter.status?.length ?? 0) + (filter.priority?.length ?? 0) + (filter.workPackages?.length ?? 0) > 0}>
+            <summary className="cursor-pointer select-none font-bold text-secondary hover:text-ink">More filters</summary>
+            <div className="mt-2 flex flex-col gap-3">
+              <div className="grid grid-cols-2 gap-3">
+                <fieldset>
+                  <legend className="mb-1 font-bold">Status</legend>
+                  {(Object.keys(STATUS_LABEL) as CardStatus[]).map((s) => (
+                    <Checkbox key={s} checked={filter.status?.includes(s) ?? false} onChange={() => onChange({ ...filter, status: toggle(filter.status, s) })} label={STATUS_LABEL[s]} />
+                  ))}
+                </fieldset>
+                <fieldset>
+                  <legend className="mb-1 font-bold">Priority</legend>
+                  {(['urgent', 'high', 'medium', 'low', 'none'] as Priority[]).map((s) => (
+                    <Checkbox key={s} checked={filter.priority?.includes(s) ?? false} onChange={() => onChange({ ...filter, priority: toggle(filter.priority, s) })} label={PRIORITY_LABEL[s]} />
+                  ))}
+                </fieldset>
               </div>
-            </fieldset>
-          )}
-          <div className="flex items-center justify-between border-t border-grid pt-2">
-            <Checkbox checked={filter.showDone !== false} onChange={(v) => onChange({ ...filter, showDone: v })} label="Show completed" />
-            <Checkbox checked={filter.match === 'all'} onChange={(v) => onChange({ ...filter, match: v ? 'all' : 'any' })} label="Match all selected" />
-          </div>
+              {workPackages && workPackages.length > 0 && (
+                <fieldset>
+                  <legend className="mb-1 font-bold">Work package</legend>
+                  <div className="flex max-h-28 flex-col gap-1 overflow-y-auto">
+                    {workPackages.map((w) => (
+                      <Checkbox
+                        key={w.id}
+                        checked={filter.workPackages?.includes(w.id) ?? false}
+                        onChange={() => onChange({ ...filter, workPackages: toggle(filter.workPackages, w.id) })}
+                        label={`${w.code} ${w.name}`}
+                      />
+                    ))}
+                    <Checkbox checked={filter.workPackages?.includes('none') ?? false} onChange={() => onChange({ ...filter, workPackages: toggle(filter.workPackages, 'none') })} label="Not in a work package" />
+                  </div>
+                </fieldset>
+              )}
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <Checkbox checked={filter.showDone !== false} onChange={(v) => onChange({ ...filter, showDone: v })} label="Show completed" />
+                <Checkbox checked={filter.match === 'all'} onChange={(v) => onChange({ ...filter, match: v ? 'all' : 'any' })} label="Match all selected" />
+              </div>
+            </div>
+          </details>
+          <SavedFilters view={view} projectId={projectId} filter={filter} active={active} onApply={(f) => (onChange(f), setOpen(false))} />
         </div>
       </Popover>
       {active && (
-        <Button size="sm" variant="ghost" icon={<X className="size-3.5" />} onClick={() => onChange({})} title="Clear filters (x)">
-          Clear
-        </Button>
+        <Button size="sm" variant="ghost" icon={<X className="size-3.5" />} onClick={() => onChange({})} title="Clear filters (x)" aria-label="Clear filters" />
       )}
-      <SavedFilters view={view} projectId={projectId} filter={filter} onApply={onChange} />
       {extra}
     </div>
   );
 }
 
-function SavedFilters({ view, projectId, filter, onApply }: { view: string; projectId?: string; filter: CardFilter; onApply: (f: CardFilter) => void }) {
+function SavedFilters({
+  view,
+  projectId,
+  filter,
+  active,
+  onApply,
+}: {
+  view: string;
+  projectId?: string;
+  filter: CardFilter;
+  active: boolean;
+  onApply: (f: CardFilter) => void;
+}) {
   const views = useSavedViews({ projectId, view });
-  const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [shared, setShared] = useState(false);
   const toast = useToast();
+  const list = views.data ?? [];
+  if (!list.length && !active) return null;
   return (
-    <Popover
-      open={open}
-      onOpenChange={setOpen}
-      trigger={
-        <Button size="sm" variant="ghost" icon={<Bookmark className="size-3.5" />}>
-          Saved views{views.data?.length ? <span className="num"> · {views.data.length}</span> : null}
-        </Button>
-      }
-    >
-      <div className="flex flex-col gap-2 text-sm">
-        {(views.data ?? []).length === 0 && <p className="text-secondary">No saved views yet.</p>}
+    <section className="flex flex-col gap-2 border-t border-grid pt-3">
+      <h3 className="font-sans text-sm font-bold">Saved filters</h3>
+      {list.length > 0 && (
         <ul className="flex flex-col">
-          {(views.data ?? []).map((v: SavedView) => (
+          {list.map((v: SavedView) => (
             <li key={v.id} className="flex items-center gap-1">
-              <button
-                className="flex-1 truncate rounded-[3px] px-1.5 py-1 text-left hover:bg-hover"
-                onClick={() => {
-                  onApply((v.config.filter as CardFilter) ?? {});
-                  setOpen(false);
-                }}
-              >
+              <button className="flex-1 truncate rounded-[3px] px-1.5 py-1 text-left hover:bg-hover" onClick={() => onApply((v.config.filter as CardFilter) ?? {})}>
                 {v.name}
                 {v.shared && <span className="text-xs text-secondary"> · shared</span>}
               </button>
-              <button aria-label={`Delete view ${v.name}`} className="p-1 text-muted hover:text-critical" onClick={() => deleteView(v).catch(toast.error)}>
+              <button aria-label={`Delete saved filter ${v.name}`} className="p-1 text-muted hover:text-critical" onClick={() => deleteView(v).catch(toast.error)}>
                 <Trash2 className="size-3.5" />
               </button>
             </li>
           ))}
         </ul>
+      )}
+      {active && (
         <form
-          className="flex flex-col gap-2 border-t border-grid pt-2"
+          className="flex flex-col gap-2"
           onSubmit={async (e) => {
             e.preventDefault();
             if (!name.trim()) return;
             try {
               await saveView({ name: name.trim(), view, project_id: projectId ?? null, config: { filter }, shared });
               setName('');
-              toast.show('View saved');
+              toast.show('Filter saved');
             } catch (err) {
               toast.error(err);
             }
           }}
         >
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name this view" className="h-8" aria-label="View name" />
-          <div className="flex items-center justify-between">
-            {projectId ? <Checkbox checked={shared} onChange={setShared} label="Share with project" /> : <span />}
+          <div className="flex gap-1.5">
+            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name this filter" className="h-8" aria-label="Filter name" />
             <Button size="sm" type="submit" icon={<Save className="size-3.5" />} disabled={!name.trim()}>
-              Save current
+              Save
             </Button>
           </div>
+          {projectId && <Checkbox checked={shared} onChange={setShared} label="Share with the project" />}
         </form>
-      </div>
-    </Popover>
+      )}
+    </section>
   );
 }

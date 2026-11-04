@@ -5,7 +5,7 @@ The frontend is a static site on **GitHub Pages**. The backend is a **Supabase**
 ## 1. Create the Supabase project
 1. Create a project at <https://supabase.com>. For EU projects, choose the Frankfurt region.
 2. From **Project Settings → API**, note the project URL `https://<ref>.supabase.co` and the **anon / publishable** key. This key is public by design; Row Level Security protects the data.
-3. Create a personal access token under **Account → Access tokens** (used by CI and the CLI). Keep it secret.
+3. Only for deploying Edge Functions: create a short-lived, project-scoped personal access token under **Account → Access tokens**, with **Edge Functions: read-write** and **Project Settings: read**. CI does not need it.
 
 ## 2. Apply the database
 ```bash
@@ -41,9 +41,8 @@ See `supabase/functions/README.md` for scheduling the digest.
     - `VITE_SUPABASE_URL` = `https://<ref>.supabase.co`
     - `VITE_SUPABASE_ANON_KEY` = the anon / publishable key
     - `SUPABASE_PROJECT_REF` = `<ref>`
-  - Secrets:
-    - `SUPABASE_ACCESS_TOKEN`
-    - `SUPABASE_DB_PASSWORD`
+  - Secret `SUPABASE_DB_PASSWORD`: lets the Deploy workflow apply new migrations through the session pooler.
+  - Optional variable `SUPABASE_POOLER_HOST`: the default is `aws-1-eu-central-1.pooler.supabase.com`. The host is shown under **Connect → Session pooler** in the Supabase dashboard.
 
 Push to `main` (or run **Deploy** manually). The site appears at `https://akaminas.github.io/Tessera/`. If the variables are missing, the deployed site says the backend is not connected; it never shows sample data.
 
@@ -63,6 +62,7 @@ npm run test:e2e             # browser tests against a running backend (see test
 |---|---|---|
 | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | build (GitHub variables / `.env.local`) | No (public) |
 | `VITE_BASE_PATH` | build (CI sets `/<repo>/`) | No |
-| `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD` | GitHub secrets (migrations) | **Yes** |
+| `SUPABASE_DB_PASSWORD` | GitHub secret (migrations) | **Yes** |
+| `SUPABASE_ACCESS_TOKEN` | your machine only, for deploying Edge Functions | **Yes** |
 | `SUPABASE_SERVICE_ROLE_KEY` | provided automatically inside Edge Functions | **Yes**, never in the frontend |
 | `RESEND_API_KEY`, `EMAIL_FROM`, `CRON_SECRET`, `APP_URL` | Supabase function secrets | **Yes** (except `APP_URL`) |

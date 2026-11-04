@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ArrowDown, ArrowUp, ChevronDown, ChevronRight, Columns3, CornerDownRight, Download, Pencil, UserPlus } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { useAuth } from '@/auth/AuthProvider';
@@ -61,7 +61,6 @@ export default function TableView() {
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [editing, setEditing] = useState<string | null>(null);
-  const textRef = useRef<HTMLInputElement>(null);
 
   const cards = useMemo(() => cardsQ.data ?? [], [cardsQ.data]);
   const boards = useMemo(() => structQ.data?.boards ?? [], [structQ.data]);
@@ -234,7 +233,7 @@ export default function TableView() {
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="no-print flex flex-wrap items-center gap-2 border-b border-grid px-3 py-2 sm:px-5">
-        <FilterBar filter={filter} onChange={setFilter} people={people} labels={labels} workPackages={wps.data} view="table" projectId={project.id} textRef={textRef} />
+        <FilterBar filter={filter} onChange={setFilter} people={people} labels={labels} workPackages={wps.data} view="table" projectId={project.id} />
         <div className="ml-auto flex flex-wrap items-center gap-2">
           <label className="flex items-center gap-1.5 text-sm">
             <span className="text-secondary">Group</span>

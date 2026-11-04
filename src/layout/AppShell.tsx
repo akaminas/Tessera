@@ -152,19 +152,13 @@ function ShellInner({ children }: { children: ReactNode }) {
   );
 }
 
+/** Silent while live updates work; speaks up only when they stop. */
 function SyncIndicator({ state }: { state: SyncState }) {
-  const meta = {
-    live: { dot: 'bg-good', label: 'Live' },
-    connecting: { dot: 'bg-warning', label: 'Connecting' },
-    offline: { dot: 'bg-critical', label: 'Offline' },
-  }[state];
+  if (state !== 'offline') return null;
   return (
-    <span
-      className="hidden items-center gap-1.5 text-xs text-secondary sm:inline-flex"
-      title={state === 'live' ? 'Changes from others appear automatically' : state === 'offline' ? 'Live updates paused. Data refreshes when you return to the tab.' : 'Connecting to live updates'}
-    >
-      <span className={cn('size-2 rounded-full', meta.dot)} aria-hidden />
-      {meta.label}
+    <span className="inline-flex items-center gap-1.5 text-xs text-secondary" role="status" title="Live updates paused. Data refreshes when you return to the tab.">
+      <span className="size-2 rounded-full bg-critical" aria-hidden />
+      Offline
     </span>
   );
 }
@@ -339,7 +333,7 @@ function Sidebar() {
       </MenuRoot>
 
       <ul className="flex flex-col gap-0.5">
-        {NAV.map((n) => (
+        {NAV.filter((n) => n.to !== "/settings").map((n) => (
           <li key={n.to}>
             <NavLink
               to={n.to}

@@ -77,19 +77,26 @@ export function BoardList({
     <section
       ref={setNodeRef}
       style={{ transform: CSS.Translate.toString(transform), transition }}
-      className={cn('flex max-h-full w-[288px] shrink-0 flex-col rounded-[6px] border border-grid bg-surface', isDragging && 'opacity-50')}
+      className={cn('group/list flex max-h-full w-[272px] shrink-0 flex-col rounded-[10px] bg-card', isDragging && 'opacity-50')}
       aria-label={`List ${list.name}`}
     >
-      <header className="flex items-center gap-1 px-2 pt-2">
+      {/* As on Trello, the whole header drags the list; the grip appears for keyboard users and on hover. */}
+      <header className={cn('relative flex items-center gap-1 px-2 pt-2', canEdit && 'cursor-grab active:cursor-grabbing')}
+        onPointerDown={(e) => {
+          // Fields, buttons and menus inside the header keep their own behaviour.
+          if (!canEdit || (e.target as HTMLElement).closest('input, textarea, button')) return;
+          listeners?.onPointerDown?.(e);
+        }}
+      >
         {canEdit && (
           <button
             ref={setActivatorNodeRef}
             {...attributes}
             {...listeners}
-            className="cursor-grab rounded-[3px] p-0.5 text-muted hover:bg-hover active:cursor-grabbing"
+            className="absolute -left-0.5 top-2.5 rounded-[3px] p-0.5 text-muted opacity-0 hover:bg-hover focus-visible:opacity-100 group-hover/list:opacity-60"
             aria-label={`Reorder list ${list.name}`}
           >
-            <GripVertical className="size-4" />
+            <GripVertical className="size-3.5" />
           </button>
         )}
         {renaming ? (
@@ -117,17 +124,23 @@ export function BoardList({
           </form>
         ) : (
           <h2
-            className="min-w-0 flex-1 cursor-text truncate px-1 font-sans text-sm font-bold"
+            className="min-w-0 flex-1 cursor-pointer truncate px-1.5 py-1 font-sans text-sm font-bold"
             onClick={() => canEdit && (setName(list.name), setRenaming(true))}
             title={list.name}
           >
             {list.name}
           </h2>
         )}
-        <span className={cn('num text-xs', overWip ? 'font-bold text-critical' : 'text-secondary')} title={list.wip_limit ? `Work-in-progress limit ${list.wip_limit}` : undefined}>
-          {cards.length !== totalCount ? `${cards.length}/${totalCount}` : totalCount}
-          {list.wip_limit ? ` / ${list.wip_limit}` : ''}
-        </span>
+        {/* Counts appear only when they say something: a filter is hiding tasks, or a limit is set. */}
+        {(cards.length !== totalCount || list.wip_limit != null) && (
+          <span
+            className={cn('num text-xs', overWip ? 'font-bold text-critical' : 'text-secondary')}
+            title={list.wip_limit ? `Work-in-progress limit ${list.wip_limit}` : `${cards.length} of ${totalCount} tasks match the filter`}
+          >
+            {cards.length !== totalCount ? `${cards.length}/${totalCount}` : totalCount}
+            {list.wip_limit ? ` / ${list.wip_limit}` : ''}
+          </span>
+        )}
         {canEdit && (
           <MenuRoot>
             <MenuTrigger asChild>
@@ -169,7 +182,7 @@ export function BoardList({
       </header>
       <div ref={setDropRef} className="scroll-thin min-h-10 flex-1 overflow-y-auto px-2 pb-1 pt-2">
         <SortableContext items={cards.map((c) => c.id)} strategy={verticalListSortingStrategy}>
-          <ul className="flex flex-col gap-1.5">
+          <ul className="flex flex-col gap-2">
             {cards.map((c) => (
               <SortableCardTile
                 key={c.id}
@@ -196,7 +209,7 @@ export function BoardList({
           {composerOpen ? (
             <Composer onSubmit={(titles) => actions.addCards(list, titles)} onClose={() => setComposerOpen(false)} />
           ) : (
-            <Button size="sm" variant="ghost" className="w-full justify-start" icon={<Plus className="size-4" />} onClick={() => setComposerOpen(true)}>
+            <Button size="sm" variant="ghost" className="w-full justify-start text-secondary hover:text-ink" icon={<Plus className="size-4" />} onClick={() => setComposerOpen(true)}>
               Add a task
             </Button>
           )}
@@ -312,7 +325,7 @@ function Composer({ onSubmit, onClose }: { onSubmit: (titles: string[]) => Promi
         placeholder="Task title. Paste several lines to add several tasks."
         aria-label="New task title"
         rows={2}
-        className="w-full resize-none rounded-[4px] border border-teal bg-card p-2 text-sm focus:outline-none"
+        className="w-full resize-none rounded-[6px] border border-teal bg-surface p-2 text-sm focus:outline-none dark:bg-grid"
       />
       <div className="flex items-center gap-1.5">
         <Button size="sm" variant="primary" loading={busy} disabled={!lines.length} onClick={() => submit(lines.length > 1)}>

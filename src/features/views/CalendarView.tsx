@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import {
   addDays,
@@ -333,7 +333,6 @@ export default function CalendarView() {
   const [filter, setFilter] = usePersistentState<CardFilter>(`cal-filter:${project.id}`, {}, 'session');
   const [drawer, setDrawer] = useState(false);
   const [createOn, setCreateOn] = useState<string | null>(null);
-  const textRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const today = format(new Date(), 'yyyy-MM-dd');
 
@@ -387,7 +386,7 @@ export default function CalendarView() {
       <div className="no-print flex flex-wrap items-center gap-3 border-b border-grid px-3 py-2 sm:px-5">
         <CalendarToolbar view={view} setView={setView} anchor={anchor} setAnchor={setAnchor} />
         <div className="ml-auto flex flex-wrap items-center gap-2">
-          <FilterBar filter={filter} onChange={setFilter} people={people} labels={structQ.data?.labels} workPackages={wps.data} view="calendar" projectId={project.id} textRef={textRef} />
+          <FilterBar filter={filter} onChange={setFilter} people={people} labels={structQ.data?.labels} workPackages={wps.data} view="calendar" projectId={project.id} />
           <Button size="sm" variant={drawer ? 'primary' : 'secondary'} icon={<CalendarX2 className="size-3.5" />} onClick={() => setDrawer((d) => !d)} aria-pressed={drawer}>
             Unscheduled <span className="num">{unscheduled.length}</span>
           </Button>

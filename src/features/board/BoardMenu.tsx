@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
-import { Archive, Copy, LayoutTemplate, MoreHorizontal, Pencil, RotateCcw, Tags, Trash2, SlidersHorizontal } from 'lucide-react';
+import { Archive, CheckSquare, Copy, LayoutTemplate, MoreHorizontal, Pencil, RotateCcw, Tags, Trash2, SlidersHorizontal } from 'lucide-react';
 import { Button, Field, IconButton, Input, Select, Tag, Textarea, familyBar } from '@/components/ui';
 import { Dialog, ConfirmDialog } from '@/components/ui/Dialog';
 import { MenuContent, MenuItem, MenuRoot, MenuSeparator, MenuTrigger } from '@/components/ui/Menu';
@@ -29,7 +29,7 @@ const BG_OPTIONS = [
 
 type Panel = null | 'edit' | 'labels' | 'fields' | 'archived' | 'duplicate' | 'delete';
 
-export function BoardMenu({ board, labels, lists }: { board: Board; labels: Label[]; lists: List[] }) {
+export function BoardMenu({ board, labels, lists, onSelectTasks }: { board: Board; labels: Label[]; lists: List[]; onSelectTasks?: () => void }) {
   const { canEdit, canManage, project } = useProjectCtx();
   const [panel, setPanel] = useState<Panel>(null);
   const toast = useToast();
@@ -46,6 +46,14 @@ export function BoardMenu({ board, labels, lists }: { board: Board; labels: Labe
           </IconButton>
         </MenuTrigger>
         <MenuContent>
+          {onSelectTasks && (
+            <>
+              <MenuItem icon={<CheckSquare className="size-4" />} onSelect={onSelectTasks}>
+                Select several tasks
+              </MenuItem>
+              <MenuSeparator />
+            </>
+          )}
           <MenuItem icon={<Pencil className="size-4" />} onSelect={() => setPanel('edit')}>
             Name, description and background
           </MenuItem>

@@ -16,7 +16,10 @@ concurrency:
 
 jobs:
   migrate:
-    # Applies database migrations when the Supabase secrets are configured.
+    # Applies database migrations when SUPABASE_DB_PASSWORD (secret) and
+    # SUPABASE_PROJECT_REF (variable) are set. It connects with the database
+    # password through Supabase's IPv4 session pooler, so no account-wide
+    # access token is stored in GitHub.
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -28,16 +31,18 @@ jobs:
       - run: npm ci
       - name: Apply migrations
         env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
           SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+          SUPABASE_POOLER_HOST: ${{ vars.SUPABASE_POOLER_HOST || 'aws-1-eu-central-1.pooler.supabase.com' }}
         run: |
-          if [ -z "$SUPABASE_ACCESS_TOKEN" ] || [ -z "$SUPABASE_PROJECT_REF" ]; then
+          if [ -z "$SUPABASE_DB_PASSWORD" ] || [ -z "$SUPABASE_PROJECT_REF" ]; then
             echo "Supabase secrets not configured; skipping migrations."
             exit 0
           fi
-          npx supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
-          npx supabase db push --password "$SUPABASE_DB_PASSWORD" --yes
+          PW=$(node -e "process.stdout.write(encodeURIComponent(process.env.SUPABASE_DB_PASSWORD))")
+          echo "::add-mask::$PW"
+          npx supabase db push --yes \
+            --db-url "postgresql://postgres.${SUPABASE_PROJECT_REF}:${PW}@${SUPABASE_POOLER_HOST}:5432/postgres"
 
   build:
     needs: migrate

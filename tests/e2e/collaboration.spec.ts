@@ -110,6 +110,31 @@ test.describe.serial('collaboration', () => {
     await a.ctx.close();
   });
 
+  test('the card back and the board filter work like Trello', async ({ browser }) => {
+    const a = await newSession(browser, alice);
+    await a.page.goto(boardUrl);
+    // Empty sections stay hidden until chosen from "Add to card".
+    await a.page.getByText('Alpha task').click();
+    const dialog = a.page.getByRole('dialog');
+    await expect(dialog.getByText('Dates', { exact: true })).toHaveCount(1); // only the sidebar button
+    await dialog.getByRole('button', { name: 'Dates' }).click();
+    await a.page.getByLabel('Due').fill('2031-05-20');
+    await a.page.getByRole('button', { name: 'Save', exact: true }).click();
+    await expect(dialog.getByText('20 May 2031')).toBeVisible();
+    await a.page.keyboard.press('Escape');
+    await a.page.keyboard.press('Escape');
+
+    // One Filter button with a keyword field inside.
+    await a.page.getByRole('button', { name: 'Filter tasks' }).click();
+    await a.page.getByLabel('Filter tasks by text').fill('Alpha');
+    await a.page.keyboard.press('Escape');
+    await expect(a.page.getByRole('region', { name: 'List To do' }).getByText('Alpha task')).toBeVisible();
+    await expect(a.page.getByText('Beta task')).toHaveCount(0);
+    await a.page.getByRole('button', { name: 'Clear filters' }).click();
+    await expect(a.page.getByText('Beta task')).toBeVisible();
+    await a.ctx.close();
+  });
+
   test('the board works on a phone without horizontal page scrolling', async ({ browser }) => {
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
     const page = await ctx.newPage();

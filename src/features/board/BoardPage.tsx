@@ -84,7 +84,7 @@ export default function BoardPage() {
   const [newBoardOpen, setNewBoardOpen] = useState(false);
   const [addingList, setAddingList] = useState(false);
   const [listName, setListName] = useState('');
-  const filterRef = useRef<HTMLInputElement>(null);
+  const filterRef = useRef<(() => void) | null>(null);
 
   const lists = useMemo(() => sortByPosition(data.data?.lists ?? []), [data.data?.lists]);
   const allCards = useMemo(() => data.data?.cards ?? [], [data.data?.cards]);
@@ -277,7 +277,7 @@ export default function BoardPage() {
 
   useShortcuts(
     [
-      { keys: 'f', description: 'Focus the filter', group: 'Board', handler: () => filterRef.current?.focus() },
+      { keys: 'f', description: 'Focus the filter', group: 'Board', handler: () => filterRef.current?.() },
       { keys: 'x', description: 'Clear filters', group: 'Board', handler: () => setFilter({}) },
       { keys: 'Enter', description: 'Open hovered task', group: 'Card', handler: () => hoveredCard && openCard(hoveredCard.id) },
       { keys: 'e', description: 'Edit title of hovered task', group: 'Card', handler: () => hoveredCard && canEdit && setEditingCard(hoveredCard.id) },
@@ -365,13 +365,16 @@ export default function BoardPage() {
             )}
           </MenuContent>
         </MenuRoot>
-        <button
-          aria-label={starred ? 'Remove board bookmark' : 'Bookmark board'}
-          className="rounded-[4px] p-1 hover:bg-hover"
-          onClick={() => toggleBookmark({ kind: 'board', target_id: board.id, project_id: project.id, label: board.name }, !starred).catch(toast.error)}
-        >
-          <Star className={cn('size-4', starred ? 'fill-[var(--v-ochre)] text-ochre' : 'text-muted')} />
-        </button>
+        {/* With one board, the project's star already covers it. */}
+        {(activeBoards.length > 1 || starred) && (
+          <button
+            aria-label={starred ? 'Remove board bookmark' : 'Bookmark board'}
+            className="rounded-[4px] p-1 hover:bg-hover"
+            onClick={() => toggleBookmark({ kind: 'board', target_id: board.id, project_id: project.id, label: board.name }, !starred).catch(toast.error)}
+          >
+            <Star className={cn('size-4', starred ? 'fill-[var(--v-ochre)] text-ochre' : 'text-muted')} />
+          </button>
+        )}
         {others.length > 0 && (
           <span className="flex items-center gap-1 text-xs text-secondary" title={`Also viewing: ${others.map((o) => o.name).join(', ')}`}>
             <Users className="size-3.5" aria-hidden />
@@ -389,15 +392,15 @@ export default function BoardPage() {
             workPackages={wps.data}
             view="board"
             projectId={project.id}
-            textRef={filterRef}
+            openRef={filterRef}
           />
-          {canEdit && (
-            <Button size="sm" variant={selectMode ? 'primary' : 'ghost'} icon={<CheckSquare className="size-3.5" />} onClick={() => setSelectMode((v) => !v)} aria-pressed={selectMode}>
-              Select
+          {selectMode && (
+            <Button size="sm" variant="primary" icon={<CheckSquare className="size-3.5" />} onClick={() => setSelectMode(false)} aria-pressed>
+              Done selecting
             </Button>
           )}
           {ctx.has('automations') && <BoardButtons projectId={project.id} boardId={board.id} canEdit={canEdit} />}
-          <BoardMenu board={board} labels={data.data?.labels ?? []} lists={lists} />
+          <BoardMenu board={board} labels={data.data?.labels ?? []} lists={lists} onSelectTasks={() => setSelectMode(true)} />
         </div>
       </div>
 
@@ -442,7 +445,7 @@ export default function BoardPage() {
             <div className="w-[288px] shrink-0">
               {addingList ? (
                 <form
-                  className="flex flex-col gap-2 rounded-[6px] border border-grid bg-surface p-2"
+                  className="flex flex-col gap-2 rounded-[10px] bg-card p-2"
                   onSubmit={async (e) => {
                     e.preventDefault();
                     if (!listName.trim()) return;
@@ -465,8 +468,8 @@ export default function BoardPage() {
                   </div>
                 </form>
               ) : (
-                <Button variant="ghost" className="w-full justify-start border border-dashed border-rule" icon={<Plus className="size-4" />} onClick={() => setAddingList(true)}>
-                  Add a list
+                <Button variant="ghost" className="w-full justify-start rounded-[10px] bg-card/70 hover:bg-card" icon={<Plus className="size-4" />} onClick={() => setAddingList(true)}>
+                  {lists.length ? 'Add another list' : 'Add a list'}
                 </Button>
               )}
             </div>

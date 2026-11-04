@@ -27,19 +27,16 @@ export default function HomePage() {
   const [capture, setCapture] = useState('');
 
   const groups = useMemo(() => groupWork(work.data ?? []), [work.data]);
-  const { overdue, today, week } = useMemo(
-    () => ({
-      overdue: groups.find((g) => g.bucket === 'overdue')?.items ?? [],
-      today: groups.find((g) => g.bucket === 'today')?.items ?? [],
-      week: groups.find((g) => g.bucket === 'week')?.items ?? [],
-    }),
-    [groups],
-  );
+  // Each task appears once: high-priority work leads, the rest falls into its date group.
+  const { priorities, overdue, today, week } = useMemo(() => {
+    const items = (b: string) => groups.find((g) => g.bucket === b)?.items ?? [];
+    const key = (w: { card_id: string; checklist_item_id?: string | null }) => w.card_id + (w.checklist_item_id ?? '');
+    const top = [...items('overdue'), ...items('today'), ...items('week')].filter((w) => w.priority === 'urgent' || w.priority === 'high').slice(0, 5);
+    const taken = new Set(top.map(key));
+    const rest = (b: string) => items(b).filter((w) => !taken.has(key(w)));
+    return { priorities: top, overdue: rest('overdue'), today: rest('today'), week: rest('week') };
+  }, [groups]);
   const inboxCount = inbox.data ? (inboxBoard.data?.cards ?? []).filter((c) => c.list_id === inbox.data!.list_id && c.status !== 'done').length : 0;
-  const priorities = useMemo(
-    () => [...today, ...week, ...overdue].filter((w) => w.priority === 'urgent' || w.priority === 'high').slice(0, 5),
-    [today, week, overdue],
-  );
   const wsProjects = (projects.data ?? []).filter((p) => p.workspace_id === current?.id && !p.personal_owner);
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';

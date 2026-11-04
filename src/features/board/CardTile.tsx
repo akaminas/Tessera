@@ -57,7 +57,7 @@ function TileBody({ card, labels, people, parentTitle, editing, onRename, onEdit
 
   return (
     <>
-      {card.cover_color && <div className={cn('-mx-2.5 -mt-2 mb-2 h-1.5 rounded-t-[3px]', familyBar[card.cover_color as LabelColor] ?? 'bg-rule')} />}
+      {card.cover_color && <div className={cn('-mx-3 -mt-2 mb-2 h-8 rounded-t-[7px]', familyBar[card.cover_color as LabelColor] ?? 'bg-rule')} />}
       {cardLabels.length > 0 && (
         <div className="mb-1 flex flex-wrap gap-1">
           {cardLabels.map((l) => (
@@ -109,8 +109,8 @@ function TileBody({ card, labels, people, parentTitle, editing, onRename, onEdit
             <span className="text-ink">Blocked</span>
           </span>
         )}
-        {card.status === 'in_progress' && <span className="text-xs text-teal-deep">In progress</span>}
-        <PriorityMark priority={card.priority} />
+        {/* The list already says where a task stands; only high and urgent priority earn a mark. */}
+        {(card.priority === 'high' || card.priority === 'urgent') && <PriorityMark priority={card.priority} />}
         {card.recurrence && <Repeat className="size-3.5" aria-label="Repeats" />}
         {card.description?.trim() && <AlignLeft className="size-3.5" aria-label="Has description" />}
         {commentCount > 0 && (
@@ -140,7 +140,7 @@ function TileBody({ card, labels, people, parentTitle, editing, onRename, onEdit
         {assignees.length > 0 && (
           <span className="ml-auto flex -space-x-1">
             {assignees.slice(0, 3).map((p) => (
-              <Avatar key={p.user_id} name={p.display_name} color={p.avatar_color} size={20} className="ring-2 ring-[var(--v-card)]" />
+              <Avatar key={p.user_id} name={p.display_name} color={p.avatar_color} size={22} className="ring-2 ring-[var(--v-surface)] dark:ring-[var(--v-grid)]" />
             ))}
             {assignees.length > 3 && <span className="pl-1.5 text-xs">+{assignees.length - 3}</span>}
           </span>
@@ -184,9 +184,9 @@ export const SortableCardTile = memo(function SortableCardTile(props: TileProps)
         }
       }}
       className={cn(
-        'group relative cursor-pointer list-none rounded-[4px] border bg-card px-2.5 py-2 outline-none',
+        'group relative cursor-pointer list-none rounded-[8px] border bg-surface px-3 py-2 shadow-[0_1px_0_var(--v-grid)] outline-none dark:bg-grid dark:shadow-[0_1px_0_rgba(0,0,0,0.35)]',
         'focus-visible:ring-2 focus-visible:ring-teal',
-        selected ? 'border-teal ring-1 ring-teal' : 'border-grid hover:border-rule',
+        selected ? 'border-teal ring-1 ring-teal' : 'border-transparent hover:border-teal',
         isDragging && 'opacity-40',
       )}
     >
@@ -207,7 +207,7 @@ export const SortableCardTile = memo(function SortableCardTile(props: TileProps)
 
 export function CardTileOverlay(props: TileProps) {
   return (
-    <div className="w-[272px] rotate-[1.5deg] cursor-grabbing rounded-[4px] border border-rule bg-card px-2.5 py-2">
+    <div className="w-[256px] rotate-[2deg] cursor-grabbing rounded-[8px] border border-rule bg-surface px-3 py-2 shadow-[0_4px_10px_rgba(42,40,37,0.15)] dark:bg-grid">
       <TileBody {...props} />
     </div>
   );

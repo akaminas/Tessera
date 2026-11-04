@@ -9,7 +9,7 @@
 - **Database behaviour:** permissions, triggers, functions and automation are tested on real PostgreSQL in `tests/db` (73 tests). They run in CI on every push.
 - **Domain logic:** unit-tested in `src/**/*.test.ts` (98 tests).
 - **Browser flows:** covered by `tests/e2e`, which needs a live Supabase backend (see [DEPLOYMENT.md](DEPLOYMENT.md)).
-- **Live backend (4 November 2026):** all 7 migrations were applied to the hosted Supabase project. All 56 tables have RLS. pg_cron runs the scheduler every minute without errors; pg_net is installed; Realtime publishes the change feed and notifications; the attachments bucket is private. The 5 end-to-end tests pass in Chromium against it, covering sign-in, workspace and project creation, invitations, two people editing live, @mentions with notifications, outsider isolation, deep links, dark theme and the phone layout. Test accounts are deleted afterwards through the Auth admin API.
+- **Live backend (4 November 2026):** all 7 migrations were applied to the hosted Supabase project. All 56 tables have RLS. pg_cron runs the scheduler every minute without errors; pg_net is installed; Realtime publishes the change feed and notifications; the attachments bucket is private. The 6 end-to-end tests pass in Chromium against it, covering sign-in, workspace and project creation, invitations, two people editing live, @mentions with notifications, outsider isolation, the card back and board filter, deep links, dark theme and the phone layout. The calendar subscription feed (Edge Function `ical`) was checked against it as well. Test accounts are deleted afterwards through the Auth admin API.
 
 ## Core structure and Trello functionality
 
