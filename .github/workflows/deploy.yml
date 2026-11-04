@@ -37,7 +37,7 @@ jobs:
             exit 0
           fi
           npx supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
-          npx supabase db push --password "$SUPABASE_DB_PASSWORD"
+          npx supabase db push --password "$SUPABASE_DB_PASSWORD" --yes
 
   build:
     needs: migrate
