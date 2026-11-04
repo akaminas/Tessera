@@ -73,7 +73,7 @@ describe('milestones and evidence', () => {
 
 describe('formatting', () => {
   it('formats cents exactly', () => {
-    expect(formatCents(1999445)).toBe('19,994.45');
+    expect(formatCents(1234567)).toBe('12,345.67');
     expect(formatCents(-5)).toBe('−0.05');
     expect(formatCents(100, 'EUR')).toBe('EUR 1.00');
   });
