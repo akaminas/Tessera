@@ -140,7 +140,7 @@ function TileBody({ card, labels, people, parentTitle, editing, onRename, onEdit
         {assignees.length > 0 && (
           <span className="ml-auto flex -space-x-1">
             {assignees.slice(0, 3).map((p) => (
-              <Avatar key={p.user_id} name={p.display_name} color={p.avatar_color} size={22} className="ring-2 ring-[var(--v-surface)] dark:ring-[var(--v-grid)]" />
+              <Avatar key={p.user_id} name={p.display_name} color={p.avatar_color} size={22} className="ring-2 ring-[var(--t-tile)]" />
             ))}
             {assignees.length > 3 && <span className="pl-1.5 text-xs">+{assignees.length - 3}</span>}
           </span>
@@ -184,7 +184,7 @@ export const SortableCardTile = memo(function SortableCardTile(props: TileProps)
         }
       }}
       className={cn(
-        'group relative cursor-pointer list-none rounded-[8px] border bg-surface px-3 py-2 shadow-[0_1px_0_var(--v-grid)] outline-none dark:bg-grid dark:shadow-[0_1px_0_rgba(0,0,0,0.35)]',
+        'group relative cursor-pointer list-none rounded-[8px] border bg-tile px-3 py-2 shadow-[var(--t-tile-shadow)] outline-none',
         'focus-visible:ring-2 focus-visible:ring-teal',
         selected ? 'border-teal ring-1 ring-teal' : 'border-transparent hover:border-teal',
         isDragging && 'opacity-40',
@@ -207,7 +207,7 @@ export const SortableCardTile = memo(function SortableCardTile(props: TileProps)
 
 export function CardTileOverlay(props: TileProps) {
   return (
-    <div className="w-[256px] rotate-[2deg] cursor-grabbing rounded-[8px] border border-rule bg-surface px-3 py-2 shadow-[0_4px_10px_rgba(42,40,37,0.15)] dark:bg-grid">
+    <div className="w-[256px] rotate-[2deg] cursor-grabbing rounded-[8px] border border-rule bg-tile px-3 py-2 shadow-[0_8px_16px_rgba(9,30,66,0.25)]">
       <TileBody {...props} />
     </div>
   );

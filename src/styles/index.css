@@ -1,6 +1,5 @@
-@import '@fontsource/lato/400.css';
-@import '@fontsource/lato/700.css';
-@import './vellum.css';
+@import '@fontsource-variable/inter/wght.css';
+@import './theme.css';
 @import 'tailwindcss';
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
@@ -41,6 +40,8 @@
   --color-hover: var(--t-hover);
   --color-selected: var(--t-selected);
   --color-link: var(--t-link);
+  --color-list: var(--t-list);
+  --color-tile: var(--t-tile);
   --font-title: var(--v-font-title);
   --font-sans: var(--v-font-body);
   --font-mono: var(--v-font-mono);
@@ -56,17 +57,24 @@
     font-family: var(--v-font-body);
     font-size: 14px;
     line-height: 1.5;
+    font-feature-settings: 'cv11', 'ss01';
     -webkit-font-smoothing: antialiased;
   }
   h1,
   h2,
   .font-title {
     font-family: var(--v-font-title);
-    font-weight: 400;
+    font-weight: 600;
+    letter-spacing: -0.011em;
   }
   h3,
   h4 {
-    font-weight: 700;
+    font-weight: 600;
+  }
+  b,
+  strong,
+  .font-bold {
+    font-weight: 600;
   }
   ::selection {
     background: var(--v-teal-tint);
@@ -184,6 +192,27 @@
     scrollbar-width: thin;
     scrollbar-color: var(--v-rule) transparent;
   }
+}
+
+/* Unlayered on purpose: these must win over Tailwind text and background utilities. */
+/* Board bar over a photo or colour: light text, quiet translucent hovers (as on Trello). */
+.on-image .board-bar :is(h2, button, a) {
+  color: #fff;
+}
+.on-image .board-bar button {
+  border-color: transparent;
+  background-color: transparent;
+}
+.on-image .board-bar button:hover,
+.on-image .board-bar button[aria-expanded='true'],
+.on-image .board-bar button[aria-pressed='true'] {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+.on-image .board-bar .text-muted {
+  color: rgba(255, 255, 255, 0.85);
+}
+.on-image > .scroll-thin {
+  scrollbar-color: rgba(255, 255, 255, 0.6) transparent;
 }
 
 @media print {

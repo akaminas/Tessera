@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router';
 import {
+  BookOpen,
   Bell,
   BookMarked,
   Briefcase,
@@ -269,6 +270,9 @@ function TopBar({
               }}
             >
               {theme === 'dark' ? 'Light theme' : 'Dark theme'}
+            </MenuItem>
+            <MenuItem icon={<BookOpen className="size-4" />} onSelect={() => navigate('/guide')}>
+              How to use Tessera
             </MenuItem>
             <MenuSeparator />
             <MenuItem icon={<LogOut className="size-4" />} onSelect={() => signOut()}>

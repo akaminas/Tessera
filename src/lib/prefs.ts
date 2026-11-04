@@ -15,7 +15,9 @@ export function readUiPrefs(): UiPrefs {
   }
 }
 
+/** Light is the default; 'system' follows the operating system. */
 export function resolvedTheme(theme: UiPrefs['theme']): 'light' | 'dark' {
+  if (!theme) return 'light';
   if (theme === 'light' || theme === 'dark') return theme;
   return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
@@ -40,7 +42,7 @@ export function watchSystemTheme() {
   const mq = window.matchMedia?.('(prefers-color-scheme: dark)');
   if (!mq) return () => {};
   const handler = () => {
-    if ((readUiPrefs().theme ?? 'system') === 'system') applyUiPrefs({});
+    if (readUiPrefs().theme === 'system') applyUiPrefs({});
   };
   mq.addEventListener('change', handler);
   return () => mq.removeEventListener('change', handler);

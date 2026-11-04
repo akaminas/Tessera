@@ -48,17 +48,7 @@ import { BulkBar } from './BulkBar';
 import { NewBoardDialog } from './NewBoardDialog';
 import { usePersistentState } from '@/lib/usePersistentState';
 import { useWorkPackagesLite } from '@/data/lite';
-
-const BACKGROUNDS: Record<string, string> = {
-  plain: 'bg-surface',
-  cream: 'bg-card',
-  teal: 'bg-[color-mix(in_oklab,var(--v-teal-tint)_22%,var(--v-surface))]',
-  indigo: 'bg-[color-mix(in_oklab,var(--v-indigo-tint)_22%,var(--v-surface))]',
-  moss: 'bg-[color-mix(in_oklab,var(--v-moss-tint)_22%,var(--v-surface))]',
-  ochre: 'bg-[color-mix(in_oklab,var(--v-ochre-tint)_22%,var(--v-surface))]',
-  terracotta: 'bg-[color-mix(in_oklab,var(--v-terracotta-tint)_20%,var(--v-surface))]',
-  mauve: 'bg-[color-mix(in_oklab,var(--v-mauve-tint)_20%,var(--v-surface))]',
-};
+import { boardBackground } from '@/domain/backgrounds';
 
 export default function BoardPage() {
   const { boardId } = useParams();
@@ -336,11 +326,13 @@ export default function BoardPage() {
   const starred = (bookmarks.data ?? []).some((b) => b.kind === 'board' && b.target_id === board.id);
   const activeCard = activeId && !activeId.startsWith('list:') ? cardById.get(activeId) : undefined;
   const activeBoards = (boards.data ?? []).filter((b) => !b.archived_at);
+  const bg = boardBackground(board.background);
   const selectedCards = [...selected].map((id) => cardById.get(id)).filter(Boolean) as CardWithRelations[];
 
   return (
-    <div className={cn('flex h-full min-h-0 flex-col', BACKGROUNDS[board.background] ?? 'bg-surface')}>
-      <div className="no-print flex flex-wrap items-center gap-2 border-b border-grid px-3 py-2 sm:px-5">
+    <div className={cn('flex h-full min-h-0 flex-col', bg.onImage && 'on-image')} style={bg.style}>
+      {/* As on Trello: on a photo or colour, the board bar is translucent with light text. */}
+      <div className={cn('board-bar no-print flex flex-wrap items-center gap-2 px-3 py-2 sm:px-5', bg.onImage ? 'bg-black/25 text-white backdrop-blur-[2px]' : 'border-b border-grid')}>
         <MenuRoot>
           <MenuTrigger asChild>
             <button className="flex items-center gap-1 rounded-[4px] px-1.5 py-1 hover:bg-hover" aria-label="Switch board">
@@ -404,7 +396,7 @@ export default function BoardPage() {
         </div>
       </div>
 
-      {board.description && <p className="px-5 pt-2 text-sm text-secondary">{board.description}</p>}
+      {board.description && <p className={cn('px-5 pt-2 text-sm', bg.onImage ? 'text-white/90 [text-shadow:0_1px_2px_rgba(0,0,0,0.5)]' : 'text-secondary')}>{board.description}</p>}
 
       <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd} onDragCancel={() => (setActiveId(null), setDragCols(null))}>
         <div className="scroll-thin flex min-h-0 flex-1 items-start gap-3 overflow-x-auto px-3 py-3 sm:px-5">
@@ -442,10 +434,10 @@ export default function BoardPage() {
             ))}
           </SortableContext>
           {canEdit && (
-            <div className="w-[288px] shrink-0">
+            <div className="w-[272px] shrink-0">
               {addingList ? (
                 <form
-                  className="flex flex-col gap-2 rounded-[10px] bg-card p-2"
+                  className="flex flex-col gap-2 rounded-[12px] bg-list p-2"
                   onSubmit={async (e) => {
                     e.preventDefault();
                     if (!listName.trim()) return;
@@ -468,7 +460,7 @@ export default function BoardPage() {
                   </div>
                 </form>
               ) : (
-                <Button variant="ghost" className="w-full justify-start rounded-[10px] bg-card/70 hover:bg-card" icon={<Plus className="size-4" />} onClick={() => setAddingList(true)}>
+                <Button variant="ghost" className={cn('w-full justify-start rounded-[12px]', bg.onImage ? 'bg-white/25 text-white hover:bg-white/35 hover:text-white' : 'bg-list hover:bg-hover')} icon={<Plus className="size-4" />} onClick={() => setAddingList(true)}>
                   {lists.length ? 'Add another list' : 'Add a list'}
                 </Button>
               )}

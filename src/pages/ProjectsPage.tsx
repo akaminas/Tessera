@@ -10,6 +10,10 @@ import { Dialog } from '@/components/ui/Dialog';
 import { useToast } from '@/components/ui/Toast';
 import { useWorkspaceCtx } from '@/layout/WorkspaceContext';
 import { cn } from '@/lib/cn';
+import { useQuery } from '@tanstack/react-query';
+import { sb } from '@/lib/supabase';
+import { must } from '@/data/errors';
+import { boardBackground } from '@/domain/backgrounds';
 import type { Project } from '@/data/types';
 
 const STATUS_LABEL: Record<Project['status'], string> = { planning: 'Planning', active: 'Active', on_hold: 'On hold', completed: 'Completed', cancelled: 'Cancelled' };
@@ -22,6 +26,19 @@ export default function ProjectsPage() {
   const [text, setText] = useState('');
   const toast = useToast();
   const creating = params.get('new') === '1';
+  const ids = (projects.data ?? []).map((p) => p.id);
+  const backgrounds = useQuery({
+    queryKey: ['ws', current?.id ?? '', 'project-backgrounds', ids.join(',')],
+    enabled: ids.length > 0,
+    queryFn: async () => {
+      const rows = must(
+        await sb().from('boards').select('project_id, background, position').in('project_id', ids).is('archived_at', null).is('deleted_at', null).eq('is_template', false).order('position'),
+      ) as { project_id: string; background: string }[];
+      const first = new Map<string, string>();
+      for (const r of rows) if (!first.has(r.project_id)) first.set(r.project_id, r.background);
+      return first;
+    },
+  });
   const list = useMemo(
     () => (projects.data ?? []).filter((p) => !p.personal_owner && (!text.trim() || `${p.name} ${p.acronym}`.toLowerCase().includes(text.toLowerCase()))),
     [projects.data, text],
@@ -48,47 +65,45 @@ export default function ProjectsPage() {
           Start from a template, or a blank project with a single board.
         </EmptyState>
       )}
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[640px] border-collapse text-sm">
-          <thead>
-            <tr className="border-b border-rule text-left">
-              <th className="py-2 pr-3 font-bold">Project</th>
-              <th className="py-2 pr-3 font-bold">Status</th>
-              <th className="py-2 pr-3 font-bold">Dates</th>
-              <th className="py-2 pr-3 font-bold">Visibility</th>
-              <th className="py-2" />
-            </tr>
-          </thead>
-          <tbody>
-            {list.map((p) => (
-              <tr key={p.id} className="border-b border-grid hover:bg-hover">
-                <td className="py-2 pr-3">
-                  <Link to={`/p/${p.id}`} className="flex items-center gap-2 hover:underline">
-                    <span className={cn('size-2.5 rounded-[2px]', familyBar[p.color])} aria-hidden />
-                    <span className="font-bold">{p.name}</span>
-                    {p.acronym && <span className="text-secondary">{p.acronym}</span>}
-                  </Link>
-                </td>
-                <td className="py-2 pr-3">
-                  {STATUS_LABEL[p.status]}
-                  {p.archived_at && <span className="text-secondary"> · archived</span>}
-                </td>
-                <td className="num py-2 pr-3 text-secondary">
-                  {p.start_date ? format(parseISO(p.start_date), 'MMM yyyy') : '—'} – {p.end_date ? format(parseISO(p.end_date), 'MMM yyyy') : '—'}
-                </td>
-                <td className="py-2 pr-3 text-secondary">{p.visibility === 'private' ? 'Members only' : 'Workspace'}</td>
-                <td className="py-2 text-right">
-                  {p.archived_at && (
-                    <Button size="sm" onClick={() => updateProject(p, { archived_at: null }).catch(toast.error)}>
-                      Restore
-                    </Button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* Trello-style tiles: each project shows its first board's background. */}
+      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        {list.map((p) => {
+          const bg = boardBackground(backgrounds.data?.get(p.id) ?? 'grad-ocean');
+          return (
+            <li key={p.id} className="relative">
+              <Link
+                to={`/p/${p.id}`}
+                className="group block h-24 overflow-hidden rounded-[8px] shadow-[var(--t-tile-shadow)] outline-none focus-visible:ring-2 focus-visible:ring-teal"
+                style={bg.style}
+              >
+                <span className={cn('flex h-full flex-col justify-between p-2.5', bg.onImage ? 'bg-black/20 text-white group-hover:bg-black/30' : 'text-ink group-hover:bg-black/5')}>
+                  <span className="line-clamp-2 font-semibold leading-snug [text-shadow:0_1px_2px_rgba(0,0,0,0.35)]">{p.name}</span>
+                  <span className="flex items-center gap-1.5 text-xs opacity-90">
+                    <span className={cn('size-2 rounded-[2px]', familyBar[p.color])} aria-hidden />
+                    {p.acronym || STATUS_LABEL[p.status]}
+                    {p.archived_at && ' · archived'}
+                  </span>
+                </span>
+              </Link>
+              {p.archived_at && (
+                <Button size="sm" className="absolute right-2 top-2" onClick={() => updateProject(p, { archived_at: null }).catch(toast.error)}>
+                  Restore
+                </Button>
+              )}
+            </li>
+          );
+        })}
+        {current?.my_role !== 'guest' && (
+          <li>
+            <button
+              onClick={() => setParams({ new: '1' })}
+              className="grid h-24 w-full place-items-center rounded-[8px] bg-card text-sm text-secondary hover:bg-hover hover:text-ink"
+            >
+              Create new project
+            </button>
+          </li>
+        )}
+      </ul>
       {creating && current && <NewProjectDialog workspaceId={current.id} onClose={() => setParams({})} />}
     </div>
   );

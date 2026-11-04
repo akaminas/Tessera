@@ -106,7 +106,7 @@ test.describe.serial('collaboration', () => {
     const theme = await a.page.evaluate(() => document.documentElement.dataset.theme);
     expect(['dark', 'light']).toContain(theme);
     const bg = await a.page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-    expect(bg === 'rgb(42, 37, 32)' || bg === 'rgb(255, 255, 255)').toBe(true);
+    expect(bg === 'rgb(13, 17, 23)' || bg === 'rgb(255, 255, 255)').toBe(true);
     await a.ctx.close();
   });
 

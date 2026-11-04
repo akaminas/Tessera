@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { Archive, CheckSquare, Copy, LayoutTemplate, MoreHorizontal, Pencil, RotateCcw, Tags, Trash2, SlidersHorizontal } from 'lucide-react';
-import { Button, Field, IconButton, Input, Select, Tag, Textarea, familyBar } from '@/components/ui';
+import { Button, Field, IconButton, Input, Select, Tag, Textarea, LABEL_COLORS, LABEL_NAME } from '@/components/ui';
+import { BOARD_BACKGROUNDS, boardBackground } from '@/domain/backgrounds';
 import { Dialog, ConfirmDialog } from '@/components/ui/Dialog';
 import { MenuContent, MenuItem, MenuRoot, MenuSeparator, MenuTrigger } from '@/components/ui/Menu';
 import { useToast } from '@/components/ui/Toast';
@@ -15,17 +16,6 @@ import type { Board, Card, Label, LabelColor, List } from '@/data/types';
 import { cn } from '@/lib/cn';
 import { CustomFieldsManager } from './CustomFieldsManager';
 
-const COLORS: LabelColor[] = ['teal', 'terracotta', 'indigo', 'ochre', 'mauve', 'moss', 'grey'];
-const BG_OPTIONS = [
-  { id: 'plain', label: 'Plain' },
-  { id: 'cream', label: 'Cream' },
-  { id: 'teal', label: 'Teal wash' },
-  { id: 'indigo', label: 'Indigo wash' },
-  { id: 'moss', label: 'Moss wash' },
-  { id: 'ochre', label: 'Ochre wash' },
-  { id: 'terracotta', label: 'Terracotta wash' },
-  { id: 'mauve', label: 'Mauve wash' },
-];
 
 type Panel = null | 'edit' | 'labels' | 'fields' | 'archived' | 'duplicate' | 'delete';
 
@@ -170,37 +160,58 @@ function EditBoard({ board, onClose }: { board: Board; onClose: () => void }) {
         <Field label="Description" htmlFor="b-desc">
           <Textarea id="b-desc" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
         </Field>
-        <fieldset>
-          <legend className="mb-1 text-[13px] font-bold">Background</legend>
-          <div className="grid grid-cols-4 gap-2">
-            {BG_OPTIONS.map((o) => (
-              <button
-                key={o.id}
-                type="button"
-                onClick={() => setBackground(o.id)}
-                aria-pressed={background === o.id}
-                className={cn('rounded-[4px] border p-2 text-left text-xs', background === o.id ? 'border-teal ring-1 ring-teal' : 'border-grid')}
-              >
-                <span
-                  className={cn(
-                    'mb-1 block h-6 rounded-[3px] border border-grid',
-                    o.id === 'plain' ? 'bg-surface' : o.id === 'cream' ? 'bg-card' : familyBar[o.id as LabelColor],
-                    o.id !== 'plain' && o.id !== 'cream' && 'opacity-25',
-                  )}
-                />
-                {o.label}
-              </button>
-            ))}
-          </div>
-        </fieldset>
+        <BackgroundPicker value={background} onChange={setBackground} />
+        <p className="text-xs text-secondary">
+          Photos from{' '}
+          <a className="text-link underline" href="https://unsplash.com" target="_blank" rel="noreferrer">
+            Unsplash
+          </a>
+          .
+        </p>
       </div>
     </Dialog>
   );
 }
 
+/** Trello-style background grid: photos first, then gradients and patterns. */
+export function BackgroundPicker({ value, onChange }: { value: string; onChange: (id: string) => void }) {
+  const current = boardBackground(value).id;
+  const groups: { title: string; items: typeof BOARD_BACKGROUNDS }[] = [
+    { title: 'Photos', items: BOARD_BACKGROUNDS.filter((b) => b.kind === 'photo') },
+    { title: 'Colours and patterns', items: BOARD_BACKGROUNDS.filter((b) => b.kind !== 'photo') },
+  ];
+  return (
+    <fieldset className="flex flex-col gap-3">
+      <legend className="mb-1 text-[13px] font-bold">Background</legend>
+      {groups.map((g) => (
+        <div key={g.title}>
+          <p className="mb-1.5 text-xs text-secondary">{g.title}</p>
+          <div className="grid grid-cols-4 gap-2">
+            {g.items.map((o) => (
+              <button
+                key={o.id}
+                type="button"
+                onClick={() => onChange(o.id)}
+                aria-pressed={current === o.id}
+                aria-label={o.label}
+                title={o.label}
+                className={cn(
+                  'h-12 rounded-[6px] border bg-clip-padding outline-none focus-visible:ring-2 focus-visible:ring-teal',
+                  current === o.id ? 'border-transparent ring-2 ring-teal ring-offset-2 ring-offset-[var(--v-surface)]' : 'border-grid hover:opacity-90',
+                )}
+                style={o.swatch}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+    </fieldset>
+  );
+}
+
 function LabelsManager({ board, labels, onClose }: { board: Board; labels: Label[]; onClose: () => void }) {
   const [name, setName] = useState('');
-  const [color, setColor] = useState<LabelColor>('teal');
+  const [color, setColor] = useState<LabelColor>('moss');
   const toast = useToast();
   return (
     <Dialog open onOpenChange={onClose} title="Labels" width={480}>
@@ -226,9 +237,9 @@ function LabelsManager({ board, labels, onClose }: { board: Board; labels: Label
           <Input id="lbl-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={60} />
         </Field>
         <Select value={color} onChange={(e) => setColor(e.target.value as LabelColor)} aria-label="Colour" className="w-32">
-          {COLORS.map((c) => (
+          {LABEL_COLORS.map((c) => (
             <option key={c} value={c}>
-              {c}
+              {LABEL_NAME[c]}
             </option>
           ))}
         </Select>
@@ -236,7 +247,7 @@ function LabelsManager({ board, labels, onClose }: { board: Board; labels: Label
           Add
         </Button>
       </form>
-      <p className="mt-3 text-xs text-secondary">Label colours come from the Vellum palette; the words carry the meaning.</p>
+      <p className="mt-3 text-xs text-secondary">A label can have just a colour, as on Trello. Naming it helps people who cannot tell the colours apart.</p>
     </Dialog>
   );
 }
@@ -247,7 +258,7 @@ function LabelRow({ label }: { label: Label }) {
   return (
     <li className="flex items-center gap-2">
       <Tag color={label.color} className="w-20 justify-center">
-        {label.name || '—'}
+        {label.name || LABEL_NAME[label.color]}
       </Tag>
       <Input
         value={name}
@@ -258,9 +269,9 @@ function LabelRow({ label }: { label: Label }) {
         maxLength={60}
       />
       <Select value={label.color} onChange={(e) => updateLabel(label, { color: e.target.value as LabelColor }).catch(toast.error)} className="h-8 w-28" aria-label="Label colour">
-        {COLORS.map((c) => (
+        {LABEL_COLORS.map((c) => (
           <option key={c} value={c}>
-            {c}
+            {LABEL_NAME[c]}
           </option>
         ))}
       </Select>

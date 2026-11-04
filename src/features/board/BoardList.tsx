@@ -77,7 +77,7 @@ export function BoardList({
     <section
       ref={setNodeRef}
       style={{ transform: CSS.Translate.toString(transform), transition }}
-      className={cn('group/list flex max-h-full w-[272px] shrink-0 flex-col rounded-[10px] bg-card', isDragging && 'opacity-50')}
+      className={cn('group/list flex max-h-full w-[272px] shrink-0 flex-col rounded-[12px] bg-list shadow-[var(--t-tile-shadow)]', isDragging && 'opacity-50')}
       aria-label={`List ${list.name}`}
     >
       {/* As on Trello, the whole header drags the list; the grip appears for keyboard users and on hover. */}
@@ -325,7 +325,7 @@ function Composer({ onSubmit, onClose }: { onSubmit: (titles: string[]) => Promi
         placeholder="Task title. Paste several lines to add several tasks."
         aria-label="New task title"
         rows={2}
-        className="w-full resize-none rounded-[6px] border border-teal bg-surface p-2 text-sm focus:outline-none dark:bg-grid"
+        className="w-full resize-none rounded-[6px] border border-teal bg-tile p-2 text-sm focus:outline-none"
       />
       <div className="flex items-center gap-1.5">
         <Button size="sm" variant="primary" loading={busy} disabled={!lines.length} onClick={() => submit(lines.length > 1)}>

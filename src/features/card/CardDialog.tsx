@@ -41,7 +41,7 @@ import { startTimer } from '@/data/personal';
 import { addChecklist, useChecklists } from '@/data/cardExtras';
 import { useMilestonesLite, useWorkPackagesLite } from '@/data/lite';
 import type { Board, CardStatus, CardWithRelations, Label, List, Priority, Recurrence } from '@/data/types';
-import { Avatar, Button, ErrorNote, IconButton, Input, Select, Spinner, Tag, Textarea, STATUS_LABEL, PRIORITY_LABEL } from '@/components/ui';
+import { Avatar, Button, ErrorNote, IconButton, Input, Select, Spinner, Tag, Textarea, STATUS_LABEL, PRIORITY_LABEL, LABEL_NAME } from '@/components/ui';
 import { MenuContent, MenuItem, MenuRoot, MenuSeparator, MenuTrigger, Popover } from '@/components/ui/Menu';
 import { ConfirmDialog, Dialog } from '@/components/ui/Dialog';
 import { Markdown } from '@/components/ui/Markdown';
@@ -243,7 +243,7 @@ export function CardDialog({ cardId, ctx, onClose }: { cardId: string; ctx: Proj
                               .filter((l) => cardLabels.has(l.id))
                               .map((l) => (
                                 <Tag key={l.id} color={l.color} className="h-7 px-2.5 text-sm">
-                                  {l.name || l.color}
+                                  {l.name || LABEL_NAME[l.color]}
                                 </Tag>
                               ))}
                             {canEdit && (
@@ -272,7 +272,7 @@ export function CardDialog({ cardId, ctx, onClose }: { cardId: string; ctx: Proj
                                               .catch(toast.error)
                                           }
                                         />
-                                        <Tag color={l.color}>{l.name || l.color}</Tag>
+                                        <Tag color={l.color}>{l.name || LABEL_NAME[l.color]}</Tag>
                                       </label>
                                     </li>
                                   ))}

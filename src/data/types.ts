@@ -2,7 +2,7 @@
 
 export type Family = 'teal' | 'terracotta' | 'indigo' | 'ochre' | 'mauve' | 'moss';
 export const FAMILIES: Family[] = ['teal', 'terracotta', 'indigo', 'ochre', 'mauve', 'moss'];
-export type LabelColor = Family | 'grey';
+export type LabelColor = Family | 'grey' | 'red' | 'pink' | 'lime';
 
 export type WorkspaceRole = 'owner' | 'admin' | 'member' | 'guest';
 export type ProjectRole = 'manager' | 'member' | 'collaborator' | 'viewer';

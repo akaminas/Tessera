@@ -6,7 +6,7 @@ import { useToast } from '@/components/ui/Toast';
 import { isFilterActive, type CardFilter, type DueFilter } from '@/domain/cardFilter';
 import { deleteView, saveView, useSavedViews, type SavedView } from '@/data/personal';
 import type { CardStatus, Label, Person, Priority } from '@/data/types';
-import { STATUS_LABEL, PRIORITY_LABEL } from '@/components/ui';
+import { STATUS_LABEL, PRIORITY_LABEL, LABEL_NAME } from '@/components/ui';
 
 const DUE_OPTIONS: { value: DueFilter; label: string }[] = [
   { value: 'any', label: 'Any date' },
@@ -132,7 +132,7 @@ export function FilterBar({
                     onClick={() => onChange({ ...filter, labels: toggle(filter.labels, l.id) })}
                     className={filter.labels?.includes(l.id) ? 'rounded-[3px] ring-2 ring-teal' : 'opacity-80 hover:opacity-100'}
                   >
-                    <Tag color={l.color}>{l.name || 'Unnamed'}</Tag>
+                    <Tag color={l.color}>{l.name || LABEL_NAME[l.color]}</Tag>
                   </button>
                 ))}
               </div>

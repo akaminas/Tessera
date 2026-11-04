@@ -23,7 +23,8 @@
 | Sharing, invitations, visibility | Complete | Invitation links tied to an email; workspace or private projects; guests. |
 | Board favourites, bookmarks | Complete | Bookmarks for boards, projects, cards and URLs in the sidebar. |
 | Board filtering, saved filters / views | Complete | Shared filter engine across views; saved views can be shared with the project. |
-| Backgrounds and appearance | Complete | Vellum washes; light and dark themes; density; motion. |
+| Backgrounds and appearance | Complete | Eight Unsplash photos, Trello-style gradients and patterns; boards start on a photo. Light (default) and dark themes on GitHub's colour-blind palette; density; motion. |
+| In-app guide | Complete | "How to use Tessera" in the account menu: 14 step-by-step sections and a shortcut table. |
 | Workspace-wide full-text search | Complete | Tasks, descriptions, projects, boards, comments; RLS-limited. |
 | Activity history: board, project, workspace, card | Complete | Trigger-written audit trail. |
 | Card create / edit / copy / move / archive / restore / trash / delete | Complete | Undo for archive, trash and move; permanent delete for managers only. |

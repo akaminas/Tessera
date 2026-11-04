@@ -5,7 +5,7 @@
 Tessera combines a Trello-style board for everyday work with the planning, reporting and financial controls of funded, multi-partner projects. A simple project is just a board. As a project grows, you switch on work packages, milestones and deliverables, budgets, KPIs, risks, meetings and automations. Everything lives in one connected database, so a change in one view appears in every other view.
 
 - **Live app:** <https://akaminas.github.io/Tessera/>
-- **Design system:** [Vellum](https://akaminas.github.io/vellum/)
+- **Look:** Trello-style boards with photo and gradient backgrounds, Trello pastel labels, the Inter typeface, and GitHub's red-green colour-blind palette in both light (default) and dark themes
 
 ## What it does
 
@@ -20,7 +20,7 @@ Tessera combines a Trello-style board for everyday work with the planning, repor
 | Real-time collaboration with conflict-safe editing | Server-side automations: rules, schedules, due-date rules, buttons | Signed webhooks (generic, Slack, Teams), iCalendar feed, GitHub link status |
 
 ## How it is built
-- **Frontend:** React 19, TypeScript, Vite, Tailwind CSS 4, React Router, TanStack Query, dnd-kit and Radix primitives, styled with Vellum tokens. Hosted on GitHub Pages.
+- **Frontend:** React 19, TypeScript, Vite, Tailwind CSS 4, React Router, TanStack Query, dnd-kit and Radix primitives, styled with theme tokens in `src/styles/theme.css`. Hosted on GitHub Pages.
 - **Backend:** Supabase.
   - PostgreSQL with Row Level Security on every table.
   - Supabase Auth.

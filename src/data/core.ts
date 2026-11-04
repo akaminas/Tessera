@@ -268,10 +268,24 @@ export function useBoards(projectId: string | undefined) {
   });
 }
 
-export async function createBoard(projectId: string, name: string, position: string, lists: string[] = ['To do', 'Doing', 'Done']) {
+/** Trello's six starter labels: colour only, named later if useful. */
+export const STARTER_LABEL_COLORS = ['moss', 'ochre', 'terracotta', 'red', 'mauve', 'indigo'] as const;
+
+export async function createBoard(
+  projectId: string,
+  name: string,
+  position: string,
+  lists: string[] = ['To do', 'Doing', 'Done'],
+  background?: string,
+) {
   const board = must(
-    await sb().from('boards').insert({ project_id: projectId, workspace_id: projectId, name, position }).select('*').single(),
+    await sb()
+      .from('boards')
+      .insert({ project_id: projectId, workspace_id: projectId, name, position, ...(background ? { background } : {}) })
+      .select('*')
+      .single(),
   ) as Board;
+  must(await sb().from('labels').insert(STARTER_LABEL_COLORS.map((color) => ({ board_id: board.id, project_id: projectId, name: '', color }))));
   if (lists.length) {
     const { generateNKeysBetween } = await import('fractional-indexing');
     const keys = generateNKeysBetween(null, null, lists.length);

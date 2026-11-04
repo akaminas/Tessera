@@ -170,30 +170,60 @@ export function Checkbox({
 
 /* ---------------------------------------------------------- Labels & badges */
 
-const familyClasses: Record<LabelColor, string> = {
-  teal: 'bg-teal-tint text-teal-deep',
-  terracotta: 'bg-terracotta-tint text-terracotta-deep',
-  indigo: 'bg-indigo-tint text-indigo-deep',
-  ochre: 'bg-ochre-tint text-ochre-deep',
-  mauve: 'bg-mauve-tint text-mauve-deep',
-  moss: 'bg-moss-tint text-moss-deep',
-  grey: 'bg-grid text-ink',
+/**
+ * Label colours use Trello's pastel set. The stored names predate it, so each
+ * maps to its Trello colour (teal is shown as sky, moss as green, and so on).
+ */
+const LABEL_VAR: Record<LabelColor, string> = {
+  moss: 'green',
+  ochre: 'yellow',
+  terracotta: 'orange',
+  red: 'red',
+  mauve: 'purple',
+  indigo: 'blue',
+  teal: 'sky',
+  lime: 'lime',
+  pink: 'pink',
+  grey: 'grey',
 };
+/** Trello order and names, for colour pickers and unnamed labels. */
+export const LABEL_COLORS: LabelColor[] = ['moss', 'ochre', 'terracotta', 'red', 'mauve', 'indigo', 'teal', 'lime', 'pink', 'grey'];
+export const LABEL_NAME: Record<LabelColor, string> = {
+  moss: 'Green',
+  ochre: 'Yellow',
+  terracotta: 'Orange',
+  red: 'Red',
+  mauve: 'Purple',
+  indigo: 'Blue',
+  teal: 'Sky',
+  lime: 'Lime',
+  pink: 'Pink',
+  grey: 'Grey',
+};
+export function labelStyle(color: LabelColor): React.CSSProperties {
+  const v = LABEL_VAR[color] ?? 'grey';
+  return { background: `var(--lbl-${v})`, color: `var(--lbl-${v}-ink)` };
+}
+/** Solid colour bars (project colours, card covers) in the same pastel set. */
 export const familyBar: Record<LabelColor, string> = {
-  teal: 'bg-teal',
-  terracotta: 'bg-terracotta',
-  indigo: 'bg-indigo',
-  ochre: 'bg-ochre',
-  mauve: 'bg-mauve',
-  moss: 'bg-moss',
-  grey: 'bg-rule',
+  moss: 'bg-[var(--lbl-green)]',
+  ochre: 'bg-[var(--lbl-yellow)]',
+  terracotta: 'bg-[var(--lbl-orange)]',
+  red: 'bg-[var(--lbl-red)]',
+  mauve: 'bg-[var(--lbl-purple)]',
+  indigo: 'bg-[var(--lbl-blue)]',
+  teal: 'bg-[var(--lbl-sky)]',
+  lime: 'bg-[var(--lbl-lime)]',
+  pink: 'bg-[var(--lbl-pink)]',
+  grey: 'bg-[var(--lbl-grey)]',
 };
 
 export function Tag({ color = 'grey', children, className, title }: { color?: LabelColor; children: ReactNode; className?: string; title?: string }) {
   return (
     <span
       title={title}
-      className={cn('inline-flex max-w-full items-center truncate rounded-[3px] px-1.5 text-xs leading-5', familyClasses[color], className)}
+      style={labelStyle(color)}
+      className={cn('inline-flex h-5 min-w-10 max-w-full items-center truncate rounded-[4px] px-2 text-xs font-medium leading-5', className)}
     >
       {children}
     </span>
@@ -222,8 +252,8 @@ export function Avatar({
     <span
       title={name}
       aria-label={name}
-      className={cn('inline-flex shrink-0 items-center justify-center rounded-full font-bold', familyClasses[color], className)}
-      style={{ width: size, height: size, fontSize: Math.max(9, size * 0.4) }}
+      className={cn('inline-flex shrink-0 items-center justify-center rounded-full font-semibold', className)}
+      style={{ ...labelStyle(color), width: size, height: size, fontSize: Math.max(9, size * 0.4) }}
     >
       {initials}
     </span>

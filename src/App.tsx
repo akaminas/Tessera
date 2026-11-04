@@ -21,6 +21,7 @@ const CalendarPage = lazy(() => import('./pages/CalendarPage'));
 const ReportsPage = lazy(() => import('./pages/ReportsPage'));
 const WorkspacePage = lazy(() => import('./pages/WorkspacePage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+const GuidePage = lazy(() => import('./pages/GuidePage'));
 const InvitePage = lazy(() => import('./pages/InvitePage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
 const ProjectLayout = lazy(() => import('./features/project/ProjectLayout'));
@@ -75,6 +76,7 @@ const router = createBrowserRouter(
             { path: 'workspace/:workspaceId/:tab', element: <WorkspacePage /> },
             { path: 'settings', element: <SettingsPage /> },
             { path: 'settings/:tab', element: <SettingsPage /> },
+            { path: 'guide', element: <GuidePage /> },
             { path: 'invite/:token', element: <InvitePage /> },
             { path: 'c/:cardId', element: <CardRedirect /> },
             {

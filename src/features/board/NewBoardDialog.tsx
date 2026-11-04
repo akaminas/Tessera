@@ -7,6 +7,8 @@ import { createBoard, duplicateBoard } from '@/data/core';
 import { keyAfterLast } from '@/domain/ordering';
 import { BOARD_TEMPLATES } from '@/domain/templates';
 import type { Board } from '@/data/types';
+import { DEFAULT_BACKGROUND, boardBackground } from '@/domain/backgrounds';
+import { BackgroundPicker } from './BoardMenu';
 
 export function NewBoardDialog({
   open,
@@ -21,6 +23,7 @@ export function NewBoardDialog({
 }) {
   const [name, setName] = useState('');
   const [source, setSource] = useState('kanban');
+  const [background, setBackground] = useState(DEFAULT_BACKGROUND);
   const [busy, setBusy] = useState(false);
   const toast = useToast();
   const navigate = useNavigate();
@@ -30,8 +33,8 @@ export function NewBoardDialog({
     <Dialog
       open={open}
       onOpenChange={onOpenChange}
-      title="New board"
-      width={460}
+      title="Create board"
+      width={480}
       footer={
         <Button
           variant="primary"
@@ -45,7 +48,7 @@ export function NewBoardDialog({
                 id = await duplicateBoard(source.slice(6), name.trim(), true);
               } else {
                 const tpl = BOARD_TEMPLATES.find((t) => t.id === source) ?? BOARD_TEMPLATES[0];
-                const b = await createBoard(projectId, name.trim(), keyAfterLast(boards), tpl.lists);
+                const b = await createBoard(projectId, name.trim(), keyAfterLast(boards), tpl.lists, background);
                 id = b.id;
               }
               onOpenChange(false);
@@ -63,7 +66,14 @@ export function NewBoardDialog({
       }
     >
       <div className="flex flex-col gap-3">
-        <Field label="Name" htmlFor="nb-name">
+        {/* A small preview of the board, as in Trello's create dialog. */}
+        <div className="mx-auto flex h-24 w-56 items-start justify-center gap-1.5 rounded-[6px] pt-3" style={boardBackground(background).style} aria-hidden>
+          {[0, 1, 2].map((i) => (
+            <span key={i} className="h-12 w-12 rounded-[4px] bg-white/80" style={{ height: 48 - i * 10 }} />
+          ))}
+        </div>
+        {!source.startsWith('board:') && <BackgroundPicker value={background} onChange={setBackground} />}
+        <Field label="Board title" htmlFor="nb-name">
           <Input id="nb-name" autoFocus value={name} onChange={(e) => setName(e.target.value)} maxLength={200} />
         </Field>
         <Field label="Start from" htmlFor="nb-src">

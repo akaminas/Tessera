@@ -1,0 +1,120 @@
+/*
+ * Tessera theme tokens.
+ *
+ * Neutrals, accent and status colours follow GitHub Primer's
+ * "Protanopia & Deuteranopia" (red-green colour-blind) light and dark themes:
+ * success is blue, danger is orange. Primer primitives are MIT-licensed.
+ * Label and board colours are Trello-style pastels. Light is the default theme.
+ *
+ * Variable names keep their original roles: --v-surface (page), --v-card
+ * (panels), --v-grid (hairlines), --v-rule (strong lines), --v-ink (text).
+ * The "teal" family is the interaction accent (GitHub blue); the other
+ * families are chart and project colours.
+ */
+
+:root {
+  color-scheme: light;
+  --v-surface: #ffffff;
+  --v-card: #f6f8fa;
+  --v-grid: #d1d9e0;
+  --v-rule: #afb8c1;
+  --v-muted: #6e7781;
+  --v-secondary: #59636e;
+  --v-ink: #1f2328;
+
+  /* family: tone, tint (soft background), deep (text on tint) */
+  --v-teal: #0969da;       --v-teal-tint: #ddf4ff;       --v-teal-deep: #0550ae;
+  --v-terracotta: #e56910; --v-terracotta-tint: #fedec8; --v-terracotta-deep: #702e00;
+  --v-indigo: #1d7afc;     --v-indigo-tint: #cce0ff;     --v-indigo-deep: #09326c;
+  --v-ochre: #b38600;      --v-ochre-tint: #f8e6a0;      --v-ochre-deep: #533f04;
+  --v-mauve: #8270db;      --v-mauve-tint: #dfd8fd;      --v-mauve-deep: #352c63;
+  --v-moss: #22a06b;       --v-moss-tint: #baf3db;       --v-moss-deep: #164b35;
+
+  /* Primer colour-blind status: success blue, attention amber, severe/danger orange */
+  --v-status-good: #0969da;
+  --v-status-warning: #9a6700;
+  --v-status-serious: #bc4c00;
+  --v-status-critical: #953800;
+
+  /* Trello-style label pastels: background and text */
+  --lbl-green: #4bce97;  --lbl-green-ink: #172b4d;
+  --lbl-yellow: #f5cd47; --lbl-yellow-ink: #172b4d;
+  --lbl-orange: #fea362; --lbl-orange-ink: #172b4d;
+  --lbl-red: #f87168;    --lbl-red-ink: #172b4d;
+  --lbl-purple: #9f8fef; --lbl-purple-ink: #172b4d;
+  --lbl-blue: #579dff;   --lbl-blue-ink: #172b4d;
+  --lbl-sky: #6cc3e0;    --lbl-sky-ink: #172b4d;
+  --lbl-lime: #94c748;   --lbl-lime-ink: #172b4d;
+  --lbl-pink: #e774bb;   --lbl-pink-ink: #172b4d;
+  --lbl-grey: #dcdfe4;   --lbl-grey-ink: #172b4d;
+
+  /* Interaction layer */
+  --t-accent: #0969da;
+  --t-accent-ink: #ffffff;
+  --t-accent-soft: #ddf4ff;
+  --t-focus: #0969da;
+  --t-hover: #eff2f5;
+  --t-selected: #ddf4ff;
+  --t-link: #0969da;
+
+  /* Board: Trello-style list panels and cards */
+  --t-list: #f1f2f4;
+  --t-tile: #ffffff;
+  --t-tile-shadow: 0 1px 1px rgba(9, 30, 66, 0.25), 0 0 1px rgba(9, 30, 66, 0.31);
+
+  --v-font-title: 'Inter Variable', Inter, -apple-system, 'Segoe UI', system-ui, sans-serif;
+  --v-font-body: 'Inter Variable', Inter, -apple-system, 'Segoe UI', system-ui, sans-serif;
+  --v-font-mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+
+  --t-density: 1;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --v-surface: #0d1117;
+  --v-card: #151b23;
+  --v-grid: #3d444d;
+  --v-rule: #656c76;
+  --v-muted: #8b949e;
+  --v-secondary: #9198a1;
+  --v-ink: #f0f6fc;
+
+  --v-teal: #4493f8;       --v-teal-tint: #12263f;       --v-teal-deep: #a5d6ff;
+  --v-terracotta: #fea362; --v-terracotta-tint: #3d2311; --v-terracotta-deep: #fedec8;
+  --v-indigo: #579dff;     --v-indigo-tint: #10294a;     --v-indigo-deep: #cce0ff;
+  --v-ochre: #e2b203;      --v-ochre-tint: #332e1b;      --v-ochre-deep: #f8e6a0;
+  --v-mauve: #9f8fef;      --v-mauve-tint: #2b273f;      --v-mauve-deep: #dfd8fd;
+  --v-moss: #4bce97;       --v-moss-tint: #1c3329;       --v-moss-deep: #baf3db;
+
+  --v-status-good: #4493f8;
+  --v-status-warning: #d29922;
+  --v-status-serious: #db6d28;
+  --v-status-critical: #f0883e;
+
+  --lbl-green: #216e4e;  --lbl-green-ink: #baf3db;
+  --lbl-yellow: #7f5f01; --lbl-yellow-ink: #f8e6a0;
+  --lbl-orange: #a54800; --lbl-orange-ink: #fedec8;
+  --lbl-red: #ae2e24;    --lbl-red-ink: #ffd5d2;
+  --lbl-purple: #5e4db2; --lbl-purple-ink: #dfd8fd;
+  --lbl-blue: #0055cc;   --lbl-blue-ink: #cce0ff;
+  --lbl-sky: #206a83;    --lbl-sky-ink: #c6edfb;
+  --lbl-lime: #4c6b1f;   --lbl-lime-ink: #d3f1a7;
+  --lbl-pink: #943d73;   --lbl-pink-ink: #fdd0ec;
+  --lbl-grey: #454f59;   --lbl-grey-ink: #dee4ea;
+
+  --t-accent: #1f6feb;
+  --t-accent-ink: #ffffff;
+  --t-accent-soft: #12263f;
+  --t-focus: #4493f8;
+  --t-hover: #1c232c;
+  --t-selected: #12263f;
+  --t-link: #4493f8;
+
+  --t-list: #161b22;
+  --t-tile: #262c36;
+  --t-tile-shadow: 0 1px 1px rgba(1, 4, 9, 0.5), 0 0 1px rgba(1, 4, 9, 0.6);
+}
+
+:root[data-density='compact'] {
+  --t-density: 0.75;
+}

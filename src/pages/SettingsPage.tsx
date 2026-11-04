@@ -119,7 +119,7 @@ function Profile() {
 function Preferences() {
   const { prefs, save } = usePrefs();
   const local = readUiPrefs();
-  const [theme, setTheme] = useState(prefs.theme ?? local.theme ?? 'system');
+  const [theme, setTheme] = useState(prefs.theme ?? local.theme ?? 'light');
   const [density, setDensity] = useState(prefs.density ?? local.density ?? 'comfortable');
   const [motion, setMotion] = useState(prefs.motion ?? local.motion ?? 'full');
   const shortcuts = useShortcutSettings();

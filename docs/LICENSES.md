@@ -14,10 +14,10 @@ Tessera's own code is released under the MIT licence (see `LICENSE`). **No sourc
 
 | Asset | Licence | Notes |
 |---|---|---|
-| Vellum tokens (`src/styles/vellum.css`) | MIT, © 2026 Alexandros Kaminas | Values copied from `style/vellum.json`; attribution kept in the file header. |
-| TeX Gyre Pagella (`public/fonts/texgyrepagella-regular.woff2`) | GUST Font License (LPPL 1.3c) | Redistributed unmodified; licence text shipped in `public/fonts/GUST-FONT-LICENSE.txt`. |
-| Lato (`@fontsource/lato`) | SIL Open Font License 1.1 | Self-hosted, unmodified. |
-| Corbel, Palatino Linotype | Microsoft system fonts | Referenced by name only; never bundled. |
+| Colour values (`src/styles/theme.css`) | GitHub Primer primitives, MIT | Neutral, accent and status values follow Primer's light and dark "Protanopia & Deuteranopia" themes. No Primer code is bundled. |
+| Label and board pastels | Colour values only | Chosen to match the look of Trello's label palette. Colours are not copyrightable, and no Atlassian assets, icons or text are used. |
+| Inter (`@fontsource-variable/inter`) | SIL Open Font License 1.1 | Self-hosted, unmodified. |
+| Board photos (`public/backgrounds/*.webp`) | [Unsplash License](https://unsplash.com/license) | Eight photos downloaded from Unsplash, resized to 1920×1080 and 320×180 WebP and self-hosted, so no third-party request is made. The licence allows free use without attribution; the picker credits Unsplash. Source photo IDs: 1501785888041-af3ef285b470, 1506905925346-21bda4d32df4, 1464822759023-fed622ff2c3b, 1507525428034-b723cf961d3e, 1441974231531-c6227db76b6e, 1418065460487-3e41a6c84dc5, 1519681393784-d120267933ba, 1500530855697-b586d89ba3ee. |
 | Map tiles | © OpenStreetMap contributors (ODbL) | Loaded at runtime with on-map attribution, per the OSM tile usage policy. |
 
 ## Runtime dependencies (shipped in the browser bundle)
@@ -38,7 +38,7 @@ Tessera's own code is released under the MIT licence (see `LICENSE`). **No sourc
 | exceljs | 4.4.0 | MIT |
 | jspdf, jspdf-autotable | 4.2.1 / 5.0.9 | MIT |
 | leaflet | 1.9.4 | BSD-2-Clause |
-| @fontsource/lato | 5.3.0 | OFL-1.1 |
+| @fontsource-variable/inter | 5.3.0 | OFL-1.1 |
 
 ### Transitive dependencies
 A scan of `package-lock.json` (production tree, 400 packages) found the following licences:

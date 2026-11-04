@@ -7,7 +7,7 @@ import { useToast } from '@/components/ui/Toast';
 import { keysAfter } from '@/domain/ordering';
 import { fetchCard, setAssignee, setCardLabel, setCardsArchived, updateCard } from '@/data/cards';
 import type { CardStatus, CardWithRelations, Label, List, Person } from '@/data/types';
-import { STATUS_LABEL } from '@/components/ui';
+import { STATUS_LABEL, LABEL_NAME } from '@/components/ui';
 
 /** Bulk actions for selected tasks. Every action is undoable where meaningful. */
 export function BulkBar({
@@ -102,7 +102,7 @@ export function BulkBar({
           <MenuContent align="start">
             {labels.map((l) => (
               <MenuItem key={l.id} onSelect={() => run(`Labelled ${l.name}`, (c) => setCardLabel(c, l.id, true))}>
-                {l.name || l.color}
+                {l.name || LABEL_NAME[l.color]}
               </MenuItem>
             ))}
           </MenuContent>

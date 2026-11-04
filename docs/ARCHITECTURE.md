@@ -7,7 +7,7 @@ Browser (GitHub Pages, static)                Supabase (managed or self-hosted)
 │ React Router (subpath-aware)  │────────────▶│ PostgREST  ── RLS on every table ──┐     │
 │ TanStack Query caches         │             │ PostgreSQL: tables, triggers, RPCs  │     │
 │ dnd-kit, Radix primitives     │◀────────────│ Realtime: change_feed + notifications│    │
-│ Vellum tokens (Tailwind 4)    │  websocket  │ Storage: private "attachments" bucket│    │
+│ Theme tokens (Tailwind 4)     │  websocket  │ Storage: private "attachments" bucket│    │
 └───────────────────────────────┘             │ pg_cron → run_scheduler() every min  │    │
                                               │ pg_net  → signed outgoing webhooks   │    │
                                               │ Edge Functions: ical, email-digest   │    │

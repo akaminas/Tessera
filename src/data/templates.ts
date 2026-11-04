@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { sb } from '@/lib/supabase';
 import { must } from './errors';
 import { queryClient } from './queryClient';
+import { STARTER_LABEL_COLORS } from './core';
 import type { Blueprint } from '@/domain/templates';
 
 export interface SavedTemplate {
@@ -24,8 +25,19 @@ export function useWorkspaceTemplates(workspaceId: string | undefined) {
 }
 
 /** Apply a blueprint to a (new) project, atomically on the server. */
+/**
+ * Every board starts like a fresh Trello board: the template's own labels plus
+ * Trello's six colour-only starter labels for any colour the template leaves unused.
+ */
+export function withStarterLabels(blueprint: Blueprint): Blueprint {
+  const labels = blueprint.labels ?? [];
+  const used = new Set(labels.map((l) => l.color));
+  const starters = STARTER_LABEL_COLORS.filter((c) => !used.has(c)).map((color) => ({ name: '', color }));
+  return { ...blueprint, labels: [...labels, ...starters] };
+}
+
 export async function applyBlueprint(projectId: string, blueprint: Blueprint, startDate: string | null) {
-  must(await sb().rpc('apply_blueprint', { p_project: projectId, p_blueprint: blueprint, p_start: startDate }));
+  must(await sb().rpc('apply_blueprint', { p_project: projectId, p_blueprint: withStarterLabels(blueprint), p_start: startDate }));
   queryClient.invalidateQueries({ queryKey: ['p', projectId] });
 }
 
