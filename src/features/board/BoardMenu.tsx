@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
-import { Archive, Copy, LayoutTemplate, MoreHorizontal, Palette, Pencil, RotateCcw, Tags, Trash2, SlidersHorizontal } from 'lucide-react';
+import { Archive, Copy, LayoutTemplate, MoreHorizontal, Pencil, RotateCcw, Tags, Trash2, SlidersHorizontal } from 'lucide-react';
 import { Button, Field, IconButton, Input, Select, Tag, Textarea, familyBar } from '@/components/ui';
 import { Dialog, ConfirmDialog } from '@/components/ui/Dialog';
 import { MenuContent, MenuItem, MenuRoot, MenuSeparator, MenuTrigger } from '@/components/ui/Menu';

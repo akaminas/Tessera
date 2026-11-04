@@ -10,8 +10,7 @@
     "skipLibCheck": true,
     "isolatedModules": true,
     "noEmit": true,
-    "baseUrl": ".",
-    "paths": { "@/*": ["src/*"] }
+    "paths": { "@/*": ["./src/*"] }
   },
   "include": ["vite.config.ts", "vitest.config.ts", "playwright.config.ts", "tests"]
 }
